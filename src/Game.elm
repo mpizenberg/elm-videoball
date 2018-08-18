@@ -10,6 +10,7 @@ import Time
 
 type alias Game =
     { startTime : Time.Posix
+    , score : ( Int, Int )
     , player1 : Player
     , player2 : Player
     , player3 : Player
@@ -33,6 +34,7 @@ type Balls
 init : Time.Posix -> Game
 init startTime =
     { startTime = startTime
+    , score = ( 0, 0 )
     , player1 = Player.init 0 Field.placePlayer1
     , player2 = Player.init 0 Field.placePlayer2
     , player3 = Player.init pi Field.placePlayer3
