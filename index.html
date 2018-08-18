@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Example: Mouse Events</title>
+	<meta charset="UTF-8">
+	<style type="text/css">
+		html, body, p {margin: 0; padding:0;}
+		html, body, div { height: 100%; }
+		div {display: flex; justify-content: center; align-items: center;}
+		p {background: lightgray; width: 60%; height: 60%;}
+	</style>
+	<script src="Main.js"></script>
+</head>
+<body>
+	<div id="elm"></div>
+	<script charset="utf-8">
+	// Function returning the size of the layout viewport.
+	const layoutViewportSize = () => ({
+		width: document.documentElement.clientWidth,
+		height: document.documentElement.clientHeight
+	});
+	const app = Elm.Main.init({
+		node: document.getElementById("elm"),
+		flags: {time: Date.now(), size: layoutViewportSize()}
+	});
+	window.addEventListener("resize", () =>
+		app.ports.resizes.send(layoutViewportSize())
+	);
+	</script>
+</body>
+</html>

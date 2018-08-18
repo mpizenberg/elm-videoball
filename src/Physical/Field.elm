@@ -1,12 +1,6 @@
 module Physical.Field exposing (..)
 
 
-type alias Field =
-    { width : Float
-    , height : Float
-    }
-
-
 width : Float
 width =
     200

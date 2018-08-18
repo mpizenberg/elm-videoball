@@ -3,7 +3,8 @@ module Physical.Bullet exposing (..)
 
 type alias Bullet =
     { pos : ( Float, Float )
-    , speed : ( Float, Float )
+    , direction : Float
+    , speed : Float
     , size : Size
     }
 
@@ -17,7 +18,8 @@ type Size
 small : Float -> ( Float, Float ) -> Bullet
 small direction pos =
     { pos = pos
-    , speed = ( 4 * cos direction, 4 * sin direction )
+    , direction = direction
+    , speed = 4
     , size = Small
     }
 
@@ -25,7 +27,8 @@ small direction pos =
 medium : Float -> ( Float, Float ) -> Bullet
 medium direction pos =
     { pos = pos
-    , speed = ( 3 * cos direction, 3 * sin direction )
+    , direction = direction
+    , speed = 3
     , size = Medium
     }
 
@@ -33,6 +36,7 @@ medium direction pos =
 big : Float -> ( Float, Float ) -> Bullet
 big direction pos =
     { pos = pos
-    , speed = ( 2 * cos direction, 2 * sin direction )
+    , direction = direction
+    , speed = 2
     , size = Big
     }
