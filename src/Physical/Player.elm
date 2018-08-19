@@ -47,7 +47,7 @@ thrustMove : Int -> Float -> Player -> Player
 thrustMove duration direction player =
     let
         thrustCoef =
-            0.001 * toFloat duration
+            0.004 * toFloat duration
 
         viscosityCoef =
             max 0 (1 - thrustCoef)
@@ -65,7 +65,32 @@ thrustMove duration direction player =
             , Tuple.second player.pos + vY * toFloat duration
             )
     in
-    { player | pos = pos, speed = ( vX, vY ), direction = direction }
+    { player | pos = pos, speed = ( vX, vY ), direction = direction, thrusting = True }
+
+
+freefallMove : Int -> Float -> Player -> Player
+freefallMove duration direction player =
+    let
+        thrustCoef =
+            0.004 * toFloat duration
+
+        viscosityCoef =
+            max 0 (1 - thrustCoef)
+
+        ( oldVX, oldVY ) =
+            player.speed
+
+        ( vX, vY ) =
+            ( viscosityCoef * oldVX
+            , viscosityCoef * oldVY
+            )
+
+        pos =
+            ( Tuple.first player.pos + vX * toFloat duration
+            , Tuple.second player.pos + vY * toFloat duration
+            )
+    in
+    { player | pos = pos, speed = ( vX, vY ), direction = direction, thrusting = False }
 
 
 stun : Time.Posix -> Player -> ( Player, MayBlock )
@@ -76,10 +101,12 @@ stun time player =
                 duration =
                     Time.posixToMillis time - Time.posixToMillis prepTime
             in
-            ( { player | stunned = Just time, shootPrep = Nothing }, MayBlock duration )
+            ( { player | stunned = Just time, shootPrep = Nothing, thrusting = False }
+            , MayBlock duration
+            )
 
         _ ->
-            ( { player | stunned = Just time }, NoBlock )
+            ( { player | stunned = Just time, thrusting = False }, NoBlock )
 
 
 prepareShot : Time.Posix -> Player -> Player

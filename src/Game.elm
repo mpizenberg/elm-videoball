@@ -61,14 +61,15 @@ update keys ({ player1 } as game) =
         thrusting =
             thrustArrowsDirection /= Arrows.NoDirection
 
-        direction =
+        newDirection =
             fromArrows thrustArrowsDirection player1.direction
 
         newPlayer1 =
-            { player1
-                | thrusting = thrusting
-                , direction = direction
-            }
+            if thrusting then
+                Player.thrustMove 20 newDirection player1
+
+            else
+                Player.freefallMove 20 newDirection player1
     in
     { game | player1 = newPlayer1 }
 
