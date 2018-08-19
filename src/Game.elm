@@ -80,9 +80,11 @@ update frameTime duration keys ({ player1 } as game) =
             case hasShot1 of
                 Player.ShotAfter _ ->
                     [ Bullet.small newPlayer1.direction newPlayer1.pos ]
+                        |> List.map (Bullet.move duration)
 
                 _ ->
                     game.bullets
+                        |> List.map (Bullet.move duration)
     in
     { game | player1 = newPlayer1, bullets = bullets }
 

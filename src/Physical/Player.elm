@@ -114,11 +114,9 @@ updateShot frameTime spaceBarDown ({ shootPrep } as player) =
     case ( spaceBarDown, shootPrep ) of
         ( True, Nothing ) ->
             ( prepareShot frameTime player, NoShot )
-                |> Debug.log "prepareShot"
 
         ( False, Just prepTime ) ->
             releaseShot frameTime player
-                |> Debug.log "releaseShot"
 
         _ ->
             ( player, NoShot )
