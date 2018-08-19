@@ -5,6 +5,7 @@ import Browser.Events
 import Game exposing (Game)
 import Html exposing (Html)
 import Html.Attributes
+import Keyboard
 import Physical.Ball
 import Physical.Block
 import Physical.Bullet
@@ -44,12 +45,14 @@ type alias Model =
     , frameSize : Size
     , frameTime : Time.Posix
     , game : Game
+    , pressedKeys : List Keyboard.Key
     }
 
 
 type Msg
     = NewFrame Time.Posix
     | Resizes Size
+    | KeyMsg Keyboard.Msg
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -58,6 +61,7 @@ init { time, size } =
       , frameSize = size
       , frameTime = Time.millisToPosix time
       , game = Game.init (Time.millisToPosix time)
+      , pressedKeys = []
       }
     , Cmd.none
     )
@@ -68,6 +72,7 @@ subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame NewFrame
         , Ports.resizes Resizes
+        , Sub.map KeyMsg Keyboard.subscriptions
         ]
 
 
@@ -81,7 +86,13 @@ update msg model =
             ( { model
                 | frameSize = model.size
                 , frameTime = time
+                , game = Game.update model.pressedKeys model.game
               }
+            , Cmd.none
+            )
+
+        KeyMsg keyMsg ->
+            ( { model | pressedKeys = Keyboard.update keyMsg model.pressedKeys }
             , Cmd.none
             )
 

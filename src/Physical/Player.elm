@@ -7,6 +7,7 @@ type alias Player =
     { pos : ( Float, Float )
     , speed : ( Float, Float )
     , direction : Float
+    , thrusting : Bool
     , stunned : Maybe Time.Posix
     , shootPrep : Maybe Time.Posix
     }
@@ -27,6 +28,7 @@ init direction pos =
     { pos = pos
     , speed = ( 0, 0 )
     , direction = direction
+    , thrusting = False
     , stunned = Nothing
     , shootPrep = Nothing
     }
