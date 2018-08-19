@@ -3,17 +3,17 @@ module Physical.Field exposing (..)
 
 width : Float
 width =
-    2400
+    3200
 
 
 height : Float
 height =
-    1200
+    1600
 
 
 playerPadding : Float
 playerPadding =
-    300
+    400
 
 
 placePlayer1 : ( Float, Float )

@@ -53,17 +53,17 @@ move duration bullet =
 
 moveSmall : Int -> Bullet -> Bullet
 moveSmall =
-    moveAtSpeed 4
+    moveAtSpeed 2.2
 
 
 moveMedium : Int -> Bullet -> Bullet
 moveMedium =
-    moveAtSpeed 3
+    moveAtSpeed 1.8
 
 
 moveBig : Int -> Bullet -> Bullet
 moveBig =
-    moveAtSpeed 2
+    moveAtSpeed 1.4
 
 
 moveAtSpeed : Float -> Int -> Bullet -> Bullet
