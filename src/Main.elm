@@ -83,10 +83,14 @@ update msg model =
             ( { model | size = size }, Cmd.none )
 
         NewFrame time ->
+            let
+                duration =
+                    Time.posixToMillis time - Time.posixToMillis model.frameTime
+            in
             ( { model
                 | frameSize = model.size
                 , frameTime = time
-                , game = Game.update model.pressedKeys model.game
+                , game = Game.update duration model.pressedKeys model.game
               }
             , Cmd.none
             )

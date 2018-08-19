@@ -7,7 +7,7 @@ import Svg.Attributes
 
 size : Float
 size =
-    20
+    40
 
 
 view : Player -> Svg msg

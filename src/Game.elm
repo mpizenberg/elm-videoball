@@ -52,8 +52,8 @@ players { player1, player2, player3, player4 } =
     [ player1, player2, player3, player4 ]
 
 
-update : List Keyboard.Key -> Game -> Game
-update keys ({ player1 } as game) =
+update : Int -> List Keyboard.Key -> Game -> Game
+update duration keys ({ player1 } as game) =
     let
         thrustArrowsDirection =
             Arrows.arrowsDirection keys
@@ -66,10 +66,10 @@ update keys ({ player1 } as game) =
 
         newPlayer1 =
             if thrusting then
-                Player.thrustMove 20 newDirection player1
+                Player.thrustMove duration newDirection player1
 
             else
-                Player.freefallMove 20 newDirection player1
+                Player.freefallMove duration newDirection player1
     in
     { game | player1 = newPlayer1 }
 
