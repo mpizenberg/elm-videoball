@@ -109,6 +109,21 @@ stun time player =
             ( { player | stunned = Just time, thrusting = False }, NoBlock )
 
 
+updateShot : Time.Posix -> Bool -> Player -> ( Player, HasShot )
+updateShot frameTime spaceBarDown ({ shootPrep } as player) =
+    case ( spaceBarDown, shootPrep ) of
+        ( True, Nothing ) ->
+            ( prepareShot frameTime player, NoShot )
+                |> Debug.log "prepareShot"
+
+        ( False, Just prepTime ) ->
+            releaseShot frameTime player
+                |> Debug.log "releaseShot"
+
+        _ ->
+            ( player, NoShot )
+
+
 prepareShot : Time.Posix -> Player -> Player
 prepareShot time player =
     case player.stunned of

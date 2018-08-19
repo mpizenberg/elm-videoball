@@ -5,20 +5,20 @@ import Svg exposing (Svg)
 import Svg.Attributes
 
 
-view : Bullet -> Svg Never
+view : Bullet -> Svg msg
 view bullet =
     case bullet.size of
         Bullet.Small ->
-            viewTriangle 4 bullet.direction bullet.pos
+            viewTriangle 40 bullet.direction bullet.pos
 
         Bullet.Medium ->
-            viewTriangle 6 bullet.direction bullet.pos
+            viewTriangle 60 bullet.direction bullet.pos
 
         Bullet.Big ->
-            viewTriangle 8 bullet.direction bullet.pos
+            viewTriangle 80 bullet.direction bullet.pos
 
 
-viewTriangle : Float -> Float -> ( Float, Float ) -> Svg Never
+viewTriangle : Float -> Float -> ( Float, Float ) -> Svg msg
 viewTriangle size direction ( x, y ) =
     let
         dirB =

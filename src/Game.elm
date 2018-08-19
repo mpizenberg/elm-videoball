@@ -52,8 +52,8 @@ players { player1, player2, player3, player4 } =
     [ player1, player2, player3, player4 ]
 
 
-update : Int -> List Keyboard.Key -> Game -> Game
-update duration keys ({ player1 } as game) =
+update : Time.Posix -> Int -> List Keyboard.Key -> Game -> Game
+update frameTime duration keys ({ player1 } as game) =
     let
         thrustArrowsDirection =
             Arrows.arrowsDirection keys
@@ -64,14 +64,27 @@ update duration keys ({ player1 } as game) =
         newDirection =
             fromArrows thrustArrowsDirection player1.direction
 
-        newPlayer1 =
+        spaceBarDown =
+            List.member Keyboard.Spacebar keys
+
+        ( newPlayer1, hasShot1 ) =
             if thrusting then
                 Player.thrustMove duration newDirection player1
+                    |> Player.updateShot frameTime spaceBarDown
 
             else
                 Player.freefallMove duration newDirection player1
+                    |> Player.updateShot frameTime spaceBarDown
+
+        bullets =
+            case hasShot1 of
+                Player.ShotAfter _ ->
+                    [ Bullet.small newPlayer1.direction newPlayer1.pos ]
+
+                _ ->
+                    game.bullets
     in
-    { game | player1 = newPlayer1 }
+    { game | player1 = newPlayer1, bullets = bullets }
 
 
 fromArrows : Arrows.Direction -> Float -> Float

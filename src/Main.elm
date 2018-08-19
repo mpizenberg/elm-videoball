@@ -90,13 +90,23 @@ update msg model =
             ( { model
                 | frameSize = model.size
                 , frameTime = time
-                , game = Game.update duration model.pressedKeys model.game
+                , game = Game.update model.frameTime duration model.pressedKeys model.game
               }
             , Cmd.none
             )
 
         KeyMsg keyMsg ->
-            ( { model | pressedKeys = Keyboard.update keyMsg model.pressedKeys }
+            let
+                parser =
+                    Keyboard.oneOf
+                        [ Keyboard.whitespaceKey
+                        , Keyboard.navigationKey
+                        ]
+
+                pressedKeys =
+                    Keyboard.updateWithParser parser keyMsg model.pressedKeys
+            in
+            ( { model | pressedKeys = pressedKeys }
             , Cmd.none
             )
 
@@ -145,7 +155,11 @@ viewGameField frameSize game =
             Game.players game
                 |> List.map Views.Svg.Player.view
 
+        bullets =
+            game.bullets
+                |> List.map Views.Svg.Bullet.view
+
         allSvgItems =
-            Views.Svg.Field.background :: players
+            Views.Svg.Field.background :: List.concat [ bullets, players ]
     in
     Views.Svg.Field.view allSvgItems
