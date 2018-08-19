@@ -1,19 +1,15 @@
 module Views.Svg.Field exposing (..)
 
 import Html exposing (Html)
+import Html.Attributes
 import Physical.Field as Field
 import Svg exposing (Svg)
 import Svg.Attributes
 
 
-view : Float -> Float -> Html msg
-view width height =
-    Svg.svg
-        [ viewBox
-        , Svg.Attributes.width (String.fromFloat width)
-        , Svg.Attributes.height (String.fromFloat height)
-        ]
-        []
+view : List (Svg msg) -> Html msg
+view =
+    Svg.svg [ viewBox ]
 
 
 viewBox : Html.Attribute msg

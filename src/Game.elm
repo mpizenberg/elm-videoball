@@ -43,3 +43,8 @@ init startTime =
     , bullets = []
     , blocks = []
     }
+
+
+players : Game -> List Player
+players { player1, player2, player3, player4 } =
+    [ player1, player2, player3, player4 ]

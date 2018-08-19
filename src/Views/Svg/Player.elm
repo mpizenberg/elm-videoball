@@ -10,7 +10,7 @@ size =
     4
 
 
-view : Player -> Svg Never
+view : Player -> Svg msg
 view { pos, direction, shootPrep } =
     let
         dirB =
