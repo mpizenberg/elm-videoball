@@ -4,7 +4,6 @@ module Game exposing (..)
 -- import Keyboard.Arrows as Arrows
 
 import Physical.Ball as Ball exposing (Ball)
-import Physical.Block as Block exposing (Block)
 import Physical.Bullet as Bullet exposing (Bullet)
 import Physical.Field as Field
 import Physical.Player as Player exposing (Player)
@@ -20,7 +19,6 @@ type alias Game =
     , player4 : Player
     , balls : Balls
     , bullets : List Bullet
-    , blocks : List Block
     }
 
 
@@ -44,7 +42,6 @@ init startTime =
     , player4 = Player.init pi Field.placePlayer4
     , balls = NoBall startTime
     , bullets = []
-    , blocks = []
     }
 
 

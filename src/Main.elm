@@ -9,7 +9,6 @@ import Game exposing (Game)
 import Html exposing (Html)
 import Html.Attributes
 import Physical.Ball
-import Physical.Block
 import Physical.Bullet
 import Physical.Field
 import Physical.Player

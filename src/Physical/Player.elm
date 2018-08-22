@@ -18,11 +18,6 @@ type HasShot
     | ShotAfter Int
 
 
-type MayBlock
-    = NoBlock
-    | MayBlock Int
-
-
 init : Float -> ( Float, Float ) -> Player
 init direction pos =
     { pos = pos
@@ -93,7 +88,7 @@ freefallMove duration direction player =
     { player | pos = pos, speed = ( vX, vY ), direction = direction, thrusting = False }
 
 
-stun : Time.Posix -> Player -> ( Player, MayBlock )
+stun : Time.Posix -> Player -> Player
 stun time player =
     case ( player.stunned, player.shootPrep ) of
         ( Nothing, Just prepTime ) ->
@@ -101,12 +96,10 @@ stun time player =
                 duration =
                     Time.posixToMillis time - Time.posixToMillis prepTime
             in
-            ( { player | stunned = Just time, shootPrep = Nothing, thrusting = False }
-            , MayBlock duration
-            )
+            { player | stunned = Just time, shootPrep = Nothing, thrusting = False }
 
         _ ->
-            ( { player | stunned = Just time, thrusting = False }, NoBlock )
+            { player | stunned = Just time, thrusting = False }
 
 
 updateShot : Time.Posix -> Bool -> Player -> ( Player, HasShot )
