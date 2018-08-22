@@ -17,8 +17,11 @@ type alias Game =
     , player2 : Player
     , player3 : Player
     , player4 : Player
+    , bullets1 : List Bullet
+    , bullets2 : List Bullet
+    , bullets3 : List Bullet
+    , bullets4 : List Bullet
     , balls : Balls
-    , bullets : List Bullet
     }
 
 
@@ -40,8 +43,11 @@ init startTime =
     , player2 = Player.init 0 Field.placePlayer2
     , player3 = Player.init pi Field.placePlayer3
     , player4 = Player.init pi Field.placePlayer4
+    , bullets1 = []
+    , bullets2 = []
+    , bullets3 = []
+    , bullets4 = []
     , balls = NoBall startTime
-    , bullets = []
     }
 
 
@@ -53,6 +59,11 @@ players { player1, player2, player3, player4 } =
 update : Time.Posix -> Int -> Game -> Game
 update frameTime duration ({ player1 } as game) =
     game
+
+
+checkCollisions : Game -> List ( Float, Int, Int )
+checkCollisions game =
+    Debug.todo "checkCollisions"
 
 
 

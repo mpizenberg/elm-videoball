@@ -16,6 +16,7 @@ import Ports
 import Time
 import Views.Svg.Bullet
 import Views.Svg.Field
+import Views.Svg.Game
 import Views.Svg.Player
 
 
@@ -131,7 +132,7 @@ view { frameSize, frameTime, game } =
         , Html.Attributes.style "height" "100%"
         ]
         [ viewGameScore game.score game.startTime frameTime
-        , viewGameField frameSize game
+        , Views.Svg.Game.viewGameField frameSize game
         ]
 
 
@@ -154,20 +155,3 @@ viewGameScore ( score1, score2 ) startTime frameTime =
                 , String.fromInt score1
                 ]
         ]
-
-
-viewGameField : Size -> Game -> Html Msg
-viewGameField frameSize game =
-    let
-        players =
-            Game.players game
-                |> List.map Views.Svg.Player.view
-
-        bullets =
-            game.bullets
-                |> List.map Views.Svg.Bullet.view
-
-        allSvgItems =
-            Views.Svg.Field.background :: List.concat [ bullets, players ]
-    in
-    Views.Svg.Field.view allSvgItems
