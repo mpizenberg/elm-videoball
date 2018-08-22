@@ -97,6 +97,33 @@ continousBBox radius ( x1, y1 ) ( x2, y2 ) =
     }
 
 
+continousBoundedEntity : Int -> Float -> Pos -> Pos -> BoundedEntity
+continousBoundedEntity id radius ( x1, y1 ) ( x2, y2 ) =
+    { id = id
+    , left = min x1 x2 - radius
+    , right = max x1 x2 + radius
+    , top = min y1 y2 - radius
+    , bottom = max y1 y2 + radius
+    }
+
+
+type alias WithBBox a =
+    { a
+        | left : Float
+        , right : Float
+        , top : Float
+        , bottom : Float
+    }
+
+
+intersects : WithBBox a -> WithBBox b -> Bool
+intersects a b =
+    (a.left <= b.right)
+        && (b.left <= a.right)
+        && (a.top <= b.bottom)
+        && (b.top <= a.bottom)
+
+
 
 -- ###################################################################
 
