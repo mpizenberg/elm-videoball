@@ -61,6 +61,9 @@ update frameTime duration ({ player1 } as game) =
     game
 
 
+{-| Returns the sorted list of collision with their inter-frame time.
+( time, id1, id2 )
+-}
 checkCollisions : Game -> List ( Float, Int, Int )
 checkCollisions game =
     Debug.todo "checkCollisions"
