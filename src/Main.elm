@@ -1,13 +1,12 @@
 module Main exposing (..)
 
--- import Keyboard
-
 import Browser
 import Browser.Events
 import Collision
 import Game exposing (Game)
 import Html exposing (Html)
 import Html.Attributes
+import Keyboard
 import Physical.Ball
 import Physical.Bullet
 import Physical.Field
@@ -47,18 +46,14 @@ type alias Model =
     , frameSize : Size
     , frameTime : Time.Posix
     , game : Game
-
-    -- , pressedKeys : List Keyboard.Key
+    , pressedKeys : List Keyboard.Key
     }
 
 
 type Msg
     = NewFrame Time.Posix
     | Resizes Size
-
-
-
--- | KeyMsg Keyboard.Msg
+    | KeyMsg Keyboard.Msg
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -67,8 +62,7 @@ init { time, size } =
       , frameSize = size
       , frameTime = Time.millisToPosix time
       , game = Game.init (Time.millisToPosix time)
-
-      -- , pressedKeys = []
+      , pressedKeys = []
       }
     , Cmd.none
     )
@@ -79,8 +73,7 @@ subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame NewFrame
         , Ports.resizes Resizes
-
-        -- , Sub.map KeyMsg Keyboard.subscriptions
+        , Sub.map KeyMsg Keyboard.subscriptions
         ]
 
 
@@ -98,29 +91,28 @@ update msg model =
             ( { model
                 | frameSize = model.size
                 , frameTime = time
-
-                -- , game = Game.update model.frameTime duration model.pressedKeys model.game
-                , game = Game.update model.frameTime duration model.game
+                , game = Game.update model.frameTime duration model.pressedKeys model.game
               }
+            , Cmd.none
+            )
+
+        KeyMsg keyMsg ->
+            let
+                parser =
+                    Keyboard.oneOf
+                        [ Keyboard.whitespaceKey
+                        , Keyboard.navigationKey
+                        ]
+
+                pressedKeys =
+                    Keyboard.updateWithParser parser keyMsg model.pressedKeys
+            in
+            ( { model | pressedKeys = pressedKeys }
             , Cmd.none
             )
 
 
 
--- KeyMsg keyMsg ->
---     let
---         parser =
---             Keyboard.oneOf
---                 [ Keyboard.whitespaceKey
---                 , Keyboard.navigationKey
---                 ]
---
---         pressedKeys =
---             Keyboard.updateWithParser parser keyMsg model.pressedKeys
---     in
---     ( { model | pressedKeys = pressedKeys }
---     , Cmd.none
---     )
 -- VIEW ####################################################
 
 
