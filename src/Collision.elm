@@ -1,5 +1,129 @@
 module Collision exposing (..)
 
+import Physical.Ball as Ball exposing (Ball)
+import Physical.Bullet as Bullet exposing (Bullet)
+import Physical.Field as Field
+import Physical.Player as Player exposing (Player)
+import Time
+
+
+type Kind
+    = PlayerPlayer OneOfFour OneOfFour
+    | PlayerWall OneOfFour Field.Wall
+    | PlayerBullet OneOfFour ( OneOfFour, Int )
+    | PlayerBall OneOfFour OneOfThree
+      -- bullets
+    | BulletBullet ( OneOfFour, Int ) ( OneOfFour, Int )
+    | BulletWall ( OneOfFour, Int ) Field.Wall
+    | BulletBall ( OneOfFour, Int ) OneOfThree
+      -- balls
+    | BallBall OneOfThree OneOfThree
+    | BallWall OneOfThree Field.Wall
+
+
+type OneOfFour
+    = Un
+    | Deux
+    | Trois
+    | Quatre
+
+
+type OneOfThree
+    = One
+    | Two
+    | Three
+
+
+
+--
+
+
+playerPlayerAll : Time.Posix -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
+playerPlayerAll endTime p1 p2 p3 p4 =
+    -- no collision between players
+    []
+
+
+
+--
+
+
+playerWallAll : Time.Posix -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
+playerWallAll endTime p1 p2 p3 p4 =
+    Debug.todo "playerWallAll"
+
+
+
+--
+
+
+playerBulletAll : Time.Posix -> Player -> Player -> Player -> Player -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
+playerBulletAll endTime p1 p2 p3 p4 bullets =
+    Debug.todo "playerBulletAll"
+
+
+
+--
+
+
+playerBallAll : Time.Posix -> Player -> Player -> Player -> Player -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+playerBallAll endTime p1 p2 p3 p4 balls =
+    Debug.todo "playerBallAll"
+
+
+
+--
+
+
+bulletBulletAll : Time.Posix -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
+bulletBulletAll endTime bullets =
+    Debug.todo "bulletBulletAll"
+
+
+
+-- bullets with walls
+
+
+bulletWallAll : Time.Posix -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
+bulletWallAll endTime bullets =
+    List.filterMap (collideWithWall endTime) bullets
+
+
+collideWithWall : Time.Posix -> ( OneOfFour, Int, Bullet ) -> Maybe { time : Float, kind : Kind }
+collideWithWall endTime ( oneOfFour, id, bullet ) =
+    Nothing
+
+
+
+--
+
+
+bulletBallAll : Time.Posix -> List ( OneOfFour, Int, Bullet ) -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+bulletBallAll endTime bullets balls =
+    Debug.todo "bulletBallAll"
+
+
+
+--
+
+
+ballBallAll : Time.Posix -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+ballBallAll endTime balls =
+    Debug.todo "ballBallAll"
+
+
+
+--
+
+
+ballWallAll : Time.Posix -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+ballWallAll endTime balls =
+    Debug.todo "ballWallAll"
+
+
+
+-- ###################################################################
+
 
 type alias Pos =
     ( Float, Float )

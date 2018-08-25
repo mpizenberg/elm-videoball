@@ -1,6 +1,13 @@
 module Physical.Field exposing (..)
 
 
+type Wall
+    = Left
+    | Right
+    | Top
+    | Bottom
+
+
 width : Float
 width =
     3200

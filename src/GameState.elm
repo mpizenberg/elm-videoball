@@ -1,9 +1,8 @@
 module GameState exposing (..)
 
-import Computation exposing (Computation)
+import Collision exposing (OneOfFour(..), OneOfThree(..))
+import Controller.Keyboard as Keyboard
 import Dict exposing (Dict)
-import Keyboard
-import Keyboard.Arrows as Arrows
 import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
 import Physical.Field as Field
@@ -59,15 +58,6 @@ players { player1, player2, player3, player4 } =
     [ player1, player2, player3, player4 ]
 
 
-type GameEffects
-    = NoEffect
-
-
-type alias GameStepComputation =
-    -- GameState -> ( GameState, SideEffect )
-    Computation GameState (SideEffect GameEffects)
-
-
 type alias Four a =
     { one : a
     , two : a
@@ -79,26 +69,25 @@ type alias Four a =
 update : Time.Posix -> Int -> List Keyboard.Key -> GameState -> GameState
 update newFrameTime duration keys gameState =
     let
-        -- process keyboard inputs
-        thrustArrowsDirection =
-            Arrows.arrowsDirection keys
+        ( thrusting1, direction1 ) =
+            Keyboard.getThrustingAndDirection keys gameState.player1.direction
 
         newDirections =
-            { one = fromArrows thrustArrowsDirection gameState.player1.direction
+            { one = direction1
             , two = gameState.player2.direction
             , three = gameState.player3.direction
             , four = gameState.player4.direction
             }
 
         newThrustings =
-            { one = thrustArrowsDirection /= Arrows.NoDirection
+            { one = thrusting1
             , two = gameState.player2.thrusting
             , three = gameState.player3.thrusting
             , four = gameState.player4.thrusting
             }
 
         newShotKeys =
-            { one = List.member Keyboard.Spacebar keys
+            { one = Keyboard.shootIsPushed keys
             , two = False
             , three = False
             , four = False
@@ -106,8 +95,13 @@ update newFrameTime duration keys gameState =
     in
     gameState
         |> preparePlayers duration newDirections newThrustings
+        |> processCollisionsUntil newFrameTime
         |> moveAllUntil newFrameTime
         |> spawnAllBullets newShotKeys
+
+
+
+-- PREPARATION #######################################################
 
 
 preparePlayers : Int -> Four Float -> Four Bool -> GameState -> GameState
@@ -118,11 +112,89 @@ preparePlayers duration directions thrustings gameState =
 
         newPlayer2 =
             Player.prepareMovement duration thrustings.two directions.two gameState.player2
+
+        newPlayer3 =
+            Player.prepareMovement duration thrustings.three directions.three gameState.player3
+
+        newPlayer4 =
+            Player.prepareMovement duration thrustings.four directions.four gameState.player4
     in
     { gameState
         | player1 = newPlayer1
         , player2 = newPlayer2
+        , player3 = newPlayer3
+        , player4 = newPlayer4
     }
+
+
+
+-- COLLISIONS ########################################################
+
+
+processCollisionsUntil : Time.Posix -> GameState -> GameState
+processCollisionsUntil endTime gameState =
+    allCollisions endTime gameState
+        |> List.sortBy .time
+        |> List.foldl processCollision gameState
+
+
+processCollision : { time : Float, kind : Collision.Kind } -> GameState -> GameState
+processCollision { time, kind } gameState =
+    -- TODO
+    gameState
+
+
+allCollisions : Time.Posix -> GameState -> List { time : Float, kind : Collision.Kind }
+allCollisions endTime ({ player1, player2, player3, player4 } as gameState) =
+    let
+        allBullets =
+            Dict.values (Dict.map (triple Un) gameState.bullets1)
+                |> reverseAppend (Dict.values (Dict.map (triple Deux) gameState.bullets2))
+                |> reverseAppend (Dict.values (Dict.map (triple Trois) gameState.bullets3))
+                |> reverseAppend (Dict.values (Dict.map (triple Quatre) gameState.bullets4))
+
+        allBalls =
+            case gameState.balls of
+                NoBall _ ->
+                    []
+
+                OneBall _ ball ->
+                    [ ( One, ball ) ]
+
+                TwoBalls _ ball1 ball2 ->
+                    [ ( One, ball1 ), ( Two, ball2 ) ]
+
+                ThreeBalls ball1 ball2 ball3 ->
+                    [ ( One, ball1 ), ( Two, ball2 ), ( Three, ball3 ) ]
+    in
+    Collision.playerPlayerAll endTime player1 player2 player3 player4
+        -- |> reverseAppend (Collision.playerWallAll endTime player1 player2 player3 player4)
+        -- |> reverseAppend (Collision.playerBulletAll endTime player1 player2 player3 player4 allBullets)
+        -- |> reverseAppend (Collision.playerBallAll endTime player1 player2 player3 player4 allBalls)
+        -- |> reverseAppend (Collision.bulletBulletAll endTime allBullets)
+        -- |> reverseAppend (Collision.bulletBallAll endTime allBullets allBalls)
+        -- |> reverseAppend (Collision.ballBallAll endTime allBalls)
+        -- |> reverseAppend (Collision.ballWallAll endTime allBalls)
+        |> reverseAppend (Collision.bulletWallAll endTime allBullets)
+
+
+triple : a -> b -> c -> ( a, b, c )
+triple a b c =
+    ( a, b, c )
+
+
+reverseAppend : List a -> List a -> List a
+reverseAppend list1 list2 =
+    case list1 of
+        [] ->
+            list2
+
+        l :: ls ->
+            reverseAppend ls (l :: list2)
+
+
+
+-- MOVE ##############################################################
 
 
 {-| Move all units until new frame time and update frame time.
@@ -175,6 +247,10 @@ moveAllUntil newFrameTime gameState =
         , bullets3 = newBullets3
         , bullets4 = newBullets4
     }
+
+
+
+-- SPAWN BULLETS #####################################################
 
 
 {-| Spawn bullets and increment frameId.
@@ -232,74 +308,3 @@ updateBullets frameId hasShot player bullets =
 spawnPlayerBullet : Int -> Player -> Bullet
 spawnPlayerBullet _ player =
     Bullet.new Bullet.Small player.direction player.pos
-
-
-fromArrows : Arrows.Direction -> Float -> Float
-fromArrows arrowsDirection previousDirection =
-    case arrowsDirection of
-        Arrows.North ->
-            north
-
-        Arrows.NorthEast ->
-            northEast
-
-        Arrows.East ->
-            east
-
-        Arrows.SouthEast ->
-            southEast
-
-        Arrows.South ->
-            south
-
-        Arrows.SouthWest ->
-            southWest
-
-        Arrows.West ->
-            west
-
-        Arrows.NorthWest ->
-            northWest
-
-        _ ->
-            previousDirection
-
-
-north : Float
-north =
-    -pi / 2
-
-
-northEast : Float
-northEast =
-    -pi / 4
-
-
-east : Float
-east =
-    0
-
-
-southEast : Float
-southEast =
-    pi / 4
-
-
-south : Float
-south =
-    pi / 2
-
-
-southWest : Float
-southWest =
-    3 * pi / 4
-
-
-west : Float
-west =
-    pi
-
-
-northWest : Float
-northWest =
-    -3 * pi / 4
