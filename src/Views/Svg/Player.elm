@@ -1,13 +1,8 @@
 module Views.Svg.Player exposing (..)
 
-import Physical.Player as Player exposing (Player)
+import Physical.Player as Player exposing (Player, size)
 import Svg exposing (Svg)
 import Svg.Attributes
-
-
-size : Float
-size =
-    40
 
 
 view : Player -> Svg msg

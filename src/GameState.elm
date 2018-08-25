@@ -1,5 +1,7 @@
-module Game exposing (..)
+module GameState exposing (..)
 
+import Computation exposing (Computation)
+import Dict exposing (Dict)
 import Keyboard
 import Keyboard.Arrows as Arrows
 import Physical.Ball as Ball exposing (Ball)
@@ -9,24 +11,21 @@ import Physical.Player as Player exposing (Player)
 import Time
 
 
-type alias Game =
+type alias GameState =
     { startTime : Time.Posix
     , score : ( Int, Int )
     , player1 : Player
     , player2 : Player
     , player3 : Player
     , player4 : Player
-    , bullets1 : List Bullet
-    , bullets2 : List Bullet
-    , bullets3 : List Bullet
-    , bullets4 : List Bullet
+    , bullets1 : Dict Int Bullet
+    , bullets2 : Dict Int Bullet
+    , bullets3 : Dict Int Bullet
+    , bullets4 : Dict Int Bullet
     , balls : Balls
     }
 
 
-{-| The time is the time at which it switched to this state.
-Useful to visualize a timer before creation of a new ball.
--}
 type Balls
     = NoBall Time.Posix
     | OneBall Time.Posix Ball
@@ -34,7 +33,7 @@ type Balls
     | ThreeBalls Ball Ball Ball
 
 
-init : Time.Posix -> Game
+init : Time.Posix -> GameState
 init startTime =
     { startTime = startTime
     , score = ( 0, 0 )
@@ -42,30 +41,45 @@ init startTime =
     , player2 = Player.init startTime 0 Field.placePlayer2
     , player3 = Player.init startTime pi Field.placePlayer3
     , player4 = Player.init startTime pi Field.placePlayer4
-    , bullets1 = []
-    , bullets2 = []
-    , bullets3 = []
-    , bullets4 = []
+    , bullets1 = Dict.empty
+    , bullets2 = Dict.empty
+    , bullets3 = Dict.empty
+    , bullets4 = Dict.empty
     , balls = NoBall startTime
     }
 
 
-players : Game -> List Player
+players : GameState -> List Player
 players { player1, player2, player3, player4 } =
     [ player1, player2, player3, player4 ]
 
 
-{-| Returns the sorted list of collision with their inter-frame time.
-( time, id1, id2 )
--}
-checkCollisions : Game -> List ( Float, Int, Int )
-checkCollisions game =
-    Debug.todo "checkCollisions"
+type SideEffect
+    = SideEffect
 
 
-update : Time.Posix -> Int -> List Keyboard.Key -> Game -> Game
-update frameTime duration keys ({ player1 } as game) =
+type alias GameStepComputation =
+    -- GameState -> ( GameState, SideEffect )
+    Computation GameState (List SideEffect)
+
+
+combineEffect : SideEffect -> GameStepComputation -> GameStepComputation
+combineEffect sideEffect =
+    Computation.mapResult (cons sideEffect)
+
+
+cons : a -> List a -> List a
+cons a list =
+    a :: list
+
+
+update : Time.Posix -> Int -> List Keyboard.Key -> GameState -> GameState
+update frameTime duration keys gameState =
     let
+        -- Player 1
+        player1 =
+            gameState.player1
+
         thrustArrowsDirection =
             Arrows.arrowsDirection keys
 
@@ -78,26 +92,21 @@ update frameTime duration keys ({ player1 } as game) =
         spaceBarDown =
             List.member Keyboard.Spacebar keys
 
-        ( newPlayer1, hasShot1 ) =
-            if thrusting then
-                Player.thrustMove duration newDirection player1
-                    |> Player.updateShot frameTime spaceBarDown
+        newPlayer1 =
+            Player.prepareMovement duration thrusting newDirection player1
+                |> Player.moveUntil frameTime
+                |> Player.checkWallObstacle 0 Field.width 0 Field.height
 
-            else
-                Player.freefallMove duration newDirection player1
-                    |> Player.updateShot frameTime spaceBarDown
+        -- Player 2
+        player2 =
+            gameState.player2
 
-        bullets1 =
-            case hasShot1 of
-                Player.ShotAfter _ ->
-                    [ Bullet.small newPlayer1.direction newPlayer1.pos ]
-                        |> List.map (Bullet.move duration)
-
-                _ ->
-                    game.bullets1
-                        |> List.map (Bullet.move duration)
+        newPlayer2 =
+            Player.prepareMovement duration False player2.direction player2
+                |> Player.moveUntil frameTime
+                |> Player.checkWallObstacle 0 Field.width 0 Field.height
     in
-    { game | player1 = newPlayer1, bullets1 = bullets1 }
+    { gameState | player1 = newPlayer1 }
 
 
 fromArrows : Arrows.Direction -> Float -> Float

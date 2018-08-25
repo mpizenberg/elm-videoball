@@ -3,6 +3,17 @@ module Physical.Player exposing (..)
 import Time
 
 
+size : Float
+size =
+    -- radius
+    40
+
+
+maxSpeed : Float
+maxSpeed =
+    1.0
+
+
 type alias Player =
     { pos : ( Float, Float )
     , speed : ( Float, Float )
@@ -10,130 +21,137 @@ type alias Player =
     , thrusting : Bool
     , stunned : Maybe Time.Posix
     , shootPrep : Maybe Time.Posix
+    , timeState : Time.Posix
     }
 
 
-type HasShot
-    = NoShot
-    | ShotAfter Int
-
-
-init : Float -> ( Float, Float ) -> Player
-init direction pos =
+init : Time.Posix -> Float -> ( Float, Float ) -> Player
+init frameTime direction pos =
     { pos = pos
     , speed = ( 0, 0 )
     , direction = direction
     , thrusting = False
     , stunned = Nothing
     , shootPrep = Nothing
+    , timeState = frameTime
     }
 
 
-{-| The movement induced by a player moving in a certain direction
-in normal conditions (not stunned).
+{-| Update thrusting, direction, speed and stunned such that
+movement can later be computed by a simple linear movement.
 
-If we set the thrust coef == viscosity coef then the max speed with
-this viscosity model is 1.0.
-Let's set that for efficiency and adapt the size of the field
-such that max speed of 1.0 is reasonable.
+  - frameTime: the time of the frame pre-movement.
+  - duration: the inter-frame duration. Needed for acceleration "integration".
 
 -}
-thrustMove : Int -> Float -> Player -> Player
-thrustMove duration direction player =
+prepareMovement : Int -> Bool -> Float -> Player -> Player
+prepareMovement duration thrusting direction player =
     let
-        thrustCoef =
+        viscosity =
             0.004 * toFloat duration
 
         viscosityCoef =
-            max 0 (1 - thrustCoef)
+            max 0 (1 - viscosity)
+
+        thrust =
+            maxSpeed * viscosity
 
         ( oldVX, oldVY ) =
             player.speed
 
-        ( vX, vY ) =
-            ( thrustCoef * cos direction + viscosityCoef * oldVX
-            , thrustCoef * sin direction + viscosityCoef * oldVY
-            )
+        stillStunned =
+            case player.stunned of
+                Just stunnedTime ->
+                    Time.posixToMillis player.timeState - Time.posixToMillis stunnedTime > 2000
 
-        pos =
-            ( Tuple.first player.pos + vX * toFloat duration
-            , Tuple.second player.pos + vY * toFloat duration
-            )
+                Nothing ->
+                    False
+
+        stunned =
+            if stillStunned then
+                player.stunned
+
+            else
+                Nothing
+
+        speed =
+            if stillStunned || not thrusting then
+                ( viscosityCoef * oldVX
+                , viscosityCoef * oldVY
+                )
+
+            else
+                ( viscosityCoef * oldVX + thrust * cos direction
+                , viscosityCoef * oldVY + thrust * sin direction
+                )
     in
-    { player | pos = pos, speed = ( vX, vY ), direction = direction, thrusting = True }
+    { player
+        | thrusting = thrusting
+        , direction = direction
+        , speed = speed
+        , stunned = stunned
+    }
 
 
-freefallMove : Int -> Float -> Player -> Player
-freefallMove duration direction player =
+moveUntil : Time.Posix -> Player -> Player
+moveUntil time player =
     let
-        thrustCoef =
-            0.004 * toFloat duration
+        deltaTime =
+            toFloat (Time.posixToMillis time - Time.posixToMillis player.timeState)
 
-        viscosityCoef =
-            max 0 (1 - thrustCoef)
-
-        ( oldVX, oldVY ) =
+        ( vX, vY ) =
             player.speed
 
-        ( vX, vY ) =
-            ( viscosityCoef * oldVX
-            , viscosityCoef * oldVY
-            )
-
         pos =
-            ( Tuple.first player.pos + vX * toFloat duration
-            , Tuple.second player.pos + vY * toFloat duration
+            ( Tuple.first player.pos + vX * deltaTime
+            , Tuple.second player.pos + vY * deltaTime
             )
     in
-    { player | pos = pos, speed = ( vX, vY ), direction = direction, thrusting = False }
+    { player | pos = pos, timeState = time }
 
 
-stun : Time.Posix -> Player -> Player
-stun time player =
-    case ( player.stunned, player.shootPrep ) of
-        ( Nothing, Just prepTime ) ->
-            let
-                duration =
-                    Time.posixToMillis time - Time.posixToMillis prepTime
-            in
-            { player | stunned = Just time, shootPrep = Nothing, thrusting = False }
+checkWallObstacle : Float -> Float -> Float -> Float -> Player -> Player
+checkWallObstacle left right top bottom player =
+    let
+        -- TODO optimize all that can be constants
+        leftLimit =
+            left + size
 
-        _ ->
-            { player | stunned = Just time, thrusting = False }
+        rightLimit =
+            right - size
 
+        topLimit =
+            top + size
 
-updateShot : Time.Posix -> Bool -> Player -> ( Player, HasShot )
-updateShot frameTime spaceBarDown ({ shootPrep } as player) =
-    case ( spaceBarDown, shootPrep ) of
-        ( True, Nothing ) ->
-            ( prepareShot frameTime player, NoShot )
+        bottomLimit =
+            bottom - size
 
-        ( False, Just prepTime ) ->
-            releaseShot frameTime player
+        ( x, y ) =
+            player.pos
 
-        _ ->
-            ( player, NoShot )
+        ( vX, vY ) =
+            player.speed
 
+        ( newX, newVX ) =
+            -- with amortization
+            if x < leftLimit then
+                ( leftLimit + 0.5 * (leftLimit - x), -0.5 * vX )
 
-prepareShot : Time.Posix -> Player -> Player
-prepareShot time player =
-    case player.stunned of
-        Just _ ->
-            player
+            else if x > rightLimit then
+                ( rightLimit - 0.5 * (x - rightLimit), -0.5 * vX )
 
-        _ ->
-            { player | shootPrep = Just time }
+            else
+                ( x, vX )
 
+        ( newY, newVY ) =
+            -- with amortization
+            if y < topLimit then
+                ( topLimit + 0.5 * (topLimit - y), -0.5 * vY )
 
-releaseShot : Time.Posix -> Player -> ( Player, HasShot )
-releaseShot time player =
-    case ( player.stunned, player.shootPrep ) of
-        ( Nothing, Just prepTime ) ->
-            let
-                duration =
-                    Time.posixToMillis time - Time.posixToMillis prepTime
-            in
-            ( { player | shootPrep = Nothing }, ShotAfter duration )
+            else if y > bottomLimit then
+                ( bottomLimit - 0.5 * (y - bottomLimit), -0.5 * vY )
 
-        _ ->
-            ( player, NoShot )
+            else
+                ( y, vY )
+    in
+    { player | pos = ( newX, newY ), speed = ( newVX, newVY ) }

@@ -3,7 +3,8 @@ module Main exposing (..)
 import Browser
 import Browser.Events
 import Collision
-import Game exposing (Game)
+import Computation
+import GameState exposing (GameState)
 import Html exposing (Html)
 import Html.Attributes
 import Keyboard
@@ -45,7 +46,7 @@ type alias Model =
     { size : Size
     , frameSize : Size
     , frameTime : Time.Posix
-    , game : Game
+    , game : GameState
     , pressedKeys : List Keyboard.Key
     }
 
@@ -61,7 +62,7 @@ init { time, size } =
     ( { size = size
       , frameSize = size
       , frameTime = Time.millisToPosix time
-      , game = Game.init (Time.millisToPosix time)
+      , game = GameState.init (Time.millisToPosix time)
       , pressedKeys = []
       }
     , Cmd.none
@@ -91,7 +92,7 @@ update msg model =
             ( { model
                 | frameSize = model.size
                 , frameTime = time
-                , game = Game.update model.frameTime duration model.pressedKeys model.game
+                , game = GameState.update model.frameTime duration model.pressedKeys model.game
               }
             , Cmd.none
             )
