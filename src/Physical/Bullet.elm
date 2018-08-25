@@ -2,9 +2,9 @@ module Physical.Bullet exposing (..)
 
 
 type alias Bullet =
-    { pos : ( Float, Float )
+    { size : Size
     , direction : Float
-    , size : Size
+    , pos : ( Float, Float )
     }
 
 
@@ -14,28 +14,9 @@ type Size
     | Big
 
 
-small : Float -> ( Float, Float ) -> Bullet
-small direction pos =
-    { pos = pos
-    , direction = direction
-    , size = Small
-    }
-
-
-medium : Float -> ( Float, Float ) -> Bullet
-medium direction pos =
-    { pos = pos
-    , direction = direction
-    , size = Medium
-    }
-
-
-big : Float -> ( Float, Float ) -> Bullet
-big direction pos =
-    { pos = pos
-    , direction = direction
-    , size = Big
-    }
+new : Size -> Float -> ( Float, Float ) -> Bullet
+new =
+    Bullet
 
 
 move : Int -> Bullet -> Bullet
