@@ -8,6 +8,7 @@ import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
 import Physical.Field as Field
 import Physical.Player as Player exposing (Player)
+import SideEffect exposing (SideEffect)
 import Time
 
 
@@ -54,59 +55,82 @@ players { player1, player2, player3, player4 } =
     [ player1, player2, player3, player4 ]
 
 
-type SideEffect
-    = SideEffect
+type GameEffects
+    = NoEffect
 
 
 type alias GameStepComputation =
     -- GameState -> ( GameState, SideEffect )
-    Computation GameState (List SideEffect)
+    Computation GameState (SideEffect GameEffects)
 
 
-combineEffect : SideEffect -> GameStepComputation -> GameStepComputation
-combineEffect sideEffect =
-    Computation.mapResult (cons sideEffect)
-
-
-cons : a -> List a -> List a
-cons a list =
-    a :: list
+type alias Four a =
+    { one : a
+    , two : a
+    , three : a
+    , four : a
+    }
 
 
 update : Time.Posix -> Int -> List Keyboard.Key -> GameState -> GameState
-update frameTime duration keys gameState =
+update newFrameTime duration keys gameState =
     let
-        -- Player 1
-        player1 =
-            gameState.player1
-
+        -- process keyboard inputs
         thrustArrowsDirection =
             Arrows.arrowsDirection keys
-
-        thrusting =
-            thrustArrowsDirection /= Arrows.NoDirection
-
-        newDirection =
-            fromArrows thrustArrowsDirection player1.direction
 
         spaceBarDown =
             List.member Keyboard.Spacebar keys
 
-        newPlayer1 =
-            Player.prepareMovement duration thrusting newDirection player1
-                |> Player.moveUntil frameTime
-                |> Player.checkWallObstacle 0 Field.width 0 Field.height
+        newDirections =
+            { one = fromArrows thrustArrowsDirection gameState.player1.direction
+            , two = gameState.player2.direction
+            , three = gameState.player3.direction
+            , four = gameState.player4.direction
+            }
 
-        -- Player 2
-        player2 =
-            gameState.player2
+        newThrustings =
+            { one = thrustArrowsDirection /= Arrows.NoDirection
+            , two = gameState.player2.thrusting
+            , three = gameState.player3.thrusting
+            , four = gameState.player4.thrusting
+            }
+    in
+    gameState
+        |> preparePlayers duration newDirections newThrustings
+        |> moveAllUntil newFrameTime
+
+
+preparePlayers : Int -> Four Float -> Four Bool -> GameState -> GameState
+preparePlayers duration directions thrustings gameState =
+    let
+        newPlayer1 =
+            Player.prepareMovement duration thrustings.one directions.one gameState.player1
 
         newPlayer2 =
-            Player.prepareMovement duration False player2.direction player2
-                |> Player.moveUntil frameTime
+            Player.prepareMovement duration thrustings.two directions.two gameState.player2
+    in
+    { gameState
+        | player1 = newPlayer1
+        , player2 = newPlayer2
+    }
+
+
+moveAllUntil : Time.Posix -> GameState -> GameState
+moveAllUntil newFrameTime gameState =
+    let
+        newPlayer1 =
+            Player.moveUntil newFrameTime gameState.player1
+                |> Player.checkWallObstacle 0 Field.width 0 Field.height
+
+        newPlayer2 =
+            Player.moveUntil newFrameTime gameState.player2
                 |> Player.checkWallObstacle 0 Field.width 0 Field.height
     in
-    { gameState | player1 = newPlayer1 }
+    { gameState
+        | player1 = newPlayer1
+        , player2 = newPlayer2
+    }
 
 
 fromArrows : Arrows.Direction -> Float -> Float
