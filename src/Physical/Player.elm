@@ -155,3 +155,29 @@ checkWallObstacle left right top bottom player =
                 ( y, vY )
     in
     { player | pos = ( newX, newY ), speed = ( newVX, newVY ) }
+
+
+
+-- SHOTS
+
+
+type HasShot
+    = NoShot
+    | ShotAfter Int
+
+
+updateShot : Bool -> Player -> ( Player, HasShot )
+updateShot spaceBarDown player =
+    case ( player.stunned, spaceBarDown, player.shootPrep ) of
+        ( Nothing, True, Nothing ) ->
+            ( { player | shootPrep = Just player.timeState }, NoShot )
+
+        ( Nothing, False, Just prepTime ) ->
+            let
+                duration =
+                    Time.posixToMillis player.timeState - Time.posixToMillis prepTime
+            in
+            ( { player | shootPrep = Nothing }, ShotAfter duration )
+
+        _ ->
+            ( player, NoShot )

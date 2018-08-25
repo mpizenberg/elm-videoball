@@ -14,6 +14,8 @@ import Time
 
 type alias GameState =
     { startTime : Time.Posix
+    , frameTime : Time.Posix
+    , frameId : Int
     , score : ( Int, Int )
     , player1 : Player
     , player2 : Player
@@ -37,6 +39,8 @@ type Balls
 init : Time.Posix -> GameState
 init startTime =
     { startTime = startTime
+    , frameTime = startTime
+    , frameId = 0
     , score = ( 0, 0 )
     , player1 = Player.init startTime 0 Field.placePlayer1
     , player2 = Player.init startTime 0 Field.placePlayer2
@@ -79,9 +83,6 @@ update newFrameTime duration keys gameState =
         thrustArrowsDirection =
             Arrows.arrowsDirection keys
 
-        spaceBarDown =
-            List.member Keyboard.Spacebar keys
-
         newDirections =
             { one = fromArrows thrustArrowsDirection gameState.player1.direction
             , two = gameState.player2.direction
@@ -95,10 +96,18 @@ update newFrameTime duration keys gameState =
             , three = gameState.player3.thrusting
             , four = gameState.player4.thrusting
             }
+
+        newShotKeys =
+            { one = List.member Keyboard.Spacebar keys
+            , two = False
+            , three = False
+            , four = False
+            }
     in
     gameState
         |> preparePlayers duration newDirections newThrustings
         |> moveAllUntil newFrameTime
+        |> spawnAllBullets newShotKeys
 
 
 preparePlayers : Int -> Four Float -> Four Bool -> GameState -> GameState
@@ -116,6 +125,8 @@ preparePlayers duration directions thrustings gameState =
     }
 
 
+{-| Move all units until new frame time and update frame time.
+-}
 moveAllUntil : Time.Posix -> GameState -> GameState
 moveAllUntil newFrameTime gameState =
     let
@@ -126,11 +137,101 @@ moveAllUntil newFrameTime gameState =
         newPlayer2 =
             Player.moveUntil newFrameTime gameState.player2
                 |> Player.checkWallObstacle 0 Field.width 0 Field.height
+
+        newPlayer3 =
+            Player.moveUntil newFrameTime gameState.player3
+                |> Player.checkWallObstacle 0 Field.width 0 Field.height
+
+        newPlayer4 =
+            Player.moveUntil newFrameTime gameState.player4
+                |> Player.checkWallObstacle 0 Field.width 0 Field.height
+
+        duration =
+            Time.posixToMillis newFrameTime - Time.posixToMillis gameState.frameTime
+
+        moveBullet _ =
+            Bullet.move duration
+
+        newBullets1 =
+            Dict.map moveBullet gameState.bullets1
+
+        newBullets2 =
+            Dict.map moveBullet gameState.bullets2
+
+        newBullets3 =
+            Dict.map moveBullet gameState.bullets3
+
+        newBullets4 =
+            Dict.map moveBullet gameState.bullets4
+    in
+    { gameState
+        | frameTime = newFrameTime
+        , player1 = newPlayer1
+        , player2 = newPlayer2
+        , player3 = newPlayer3
+        , player4 = newPlayer4
+        , bullets1 = newBullets1
+        , bullets2 = newBullets2
+        , bullets3 = newBullets3
+        , bullets4 = newBullets4
+    }
+
+
+{-| Spawn bullets and increment frameId.
+-}
+spawnAllBullets : Four Bool -> GameState -> GameState
+spawnAllBullets shotKeys gameState =
+    let
+        ( newPlayer1, hasShot1 ) =
+            Player.updateShot shotKeys.one gameState.player1
+
+        ( newPlayer2, hasShot2 ) =
+            Player.updateShot shotKeys.two gameState.player2
+
+        ( newPlayer3, hasShot3 ) =
+            Player.updateShot shotKeys.three gameState.player3
+
+        ( newPlayer4, hasShot4 ) =
+            Player.updateShot shotKeys.four gameState.player4
+
+        newBullets1 =
+            updateBullets gameState.frameId hasShot1 gameState.player1 gameState.bullets1
+
+        newBullets2 =
+            updateBullets gameState.frameId hasShot2 gameState.player2 gameState.bullets2
+
+        newBullets3 =
+            updateBullets gameState.frameId hasShot3 gameState.player3 gameState.bullets3
+
+        newBullets4 =
+            updateBullets gameState.frameId hasShot4 gameState.player4 gameState.bullets4
     in
     { gameState
         | player1 = newPlayer1
         , player2 = newPlayer2
+        , player3 = newPlayer3
+        , player4 = newPlayer4
+        , bullets1 = newBullets1
+        , bullets2 = newBullets2
+        , bullets3 = newBullets3
+        , bullets4 = newBullets4
+        , frameId = gameState.frameId + 1
     }
+
+
+updateBullets : Int -> Player.HasShot -> Player -> Dict Int Bullet -> Dict Int Bullet
+updateBullets frameId hasShot player bullets =
+    case hasShot of
+        Player.NoShot ->
+            bullets
+
+        Player.ShotAfter chargeTime ->
+            Dict.insert frameId (spawnPlayerBullet chargeTime player) bullets
+
+
+spawnPlayerBullet : Int -> Player -> Bullet
+spawnPlayerBullet _ player =
+    Bullet.new Bullet.Small player.direction player.pos
 
 
 fromArrows : Arrows.Direction -> Float -> Float
