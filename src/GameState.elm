@@ -145,6 +145,15 @@ processCollision { time, kind } gameState =
         Collision.BulletWall ( Un, id ) _ ->
             { gameState | bullets1 = Dict.remove id gameState.bullets1 }
 
+        Collision.BulletWall ( Deux, id ) _ ->
+            { gameState | bullets2 = Dict.remove id gameState.bullets2 }
+
+        Collision.BulletWall ( Trois, id ) _ ->
+            { gameState | bullets3 = Dict.remove id gameState.bullets3 }
+
+        Collision.BulletWall ( Quatre, id ) _ ->
+            { gameState | bullets4 = Dict.remove id gameState.bullets4 }
+
         _ ->
             gameState
 
