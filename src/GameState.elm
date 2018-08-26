@@ -135,14 +135,18 @@ processCollisionsUntil : Time.Posix -> GameState -> GameState
 processCollisionsUntil endTime gameState =
     allCollisions endTime gameState
         |> List.sortBy .time
-        |> Debug.log "allCollisions"
+        -- |> Debug.log "allCollisions"
         |> List.foldl processCollision gameState
 
 
 processCollision : { time : Float, kind : Collision.Kind } -> GameState -> GameState
 processCollision { time, kind } gameState =
-    -- TODO
-    gameState
+    case kind of
+        Collision.BulletWall ( Un, id ) _ ->
+            { gameState | bullets1 = Dict.remove id gameState.bullets1 }
+
+        _ ->
+            gameState
 
 
 allCollisions : Time.Posix -> GameState -> List { time : Float, kind : Collision.Kind }
