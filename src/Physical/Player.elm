@@ -25,6 +25,12 @@ type alias Player =
     }
 
 
+type alias Control =
+    { thrusting : Maybe Float
+    , holdingShot : Bool
+    }
+
+
 init : Time.Posix -> Float -> ( Float, Float ) -> Player
 init frameTime direction pos =
     { pos = pos

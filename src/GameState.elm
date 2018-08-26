@@ -66,31 +66,28 @@ type alias Four a =
     }
 
 
-update : Time.Posix -> Int -> List Keyboard.Key -> GameState -> GameState
-update newFrameTime duration keys gameState =
+update : Time.Posix -> Int -> List Keyboard.Key -> Four Player.Control -> GameState -> GameState
+update newFrameTime duration keys playerControls gameState =
     let
-        ( thrusting1, direction1 ) =
-            Keyboard.getThrustingAndDirection keys gameState.player1.direction
-
         newDirections =
-            { one = direction1
+            { one = Maybe.withDefault gameState.player1.direction playerControls.one.thrusting
             , two = gameState.player2.direction
             , three = gameState.player3.direction
             , four = gameState.player4.direction
             }
 
         newThrustings =
-            { one = thrusting1
+            { one = not (isNothing playerControls.one.thrusting)
             , two = gameState.player2.thrusting
             , three = gameState.player3.thrusting
             , four = gameState.player4.thrusting
             }
 
         newShotKeys =
-            { one = Keyboard.shootIsPushed keys
-            , two = False
-            , three = False
-            , four = False
+            { one = playerControls.one.holdingShot
+            , two = playerControls.two.holdingShot
+            , three = playerControls.three.holdingShot
+            , four = playerControls.four.holdingShot
             }
     in
     gameState
@@ -98,6 +95,16 @@ update newFrameTime duration keys gameState =
         |> processCollisionsUntil newFrameTime
         |> moveAllUntil newFrameTime
         |> spawnAllBullets newShotKeys
+
+
+isNothing : Maybe a -> Bool
+isNothing maybe =
+    case maybe of
+        Nothing ->
+            True
+
+        _ ->
+            False
 
 
 

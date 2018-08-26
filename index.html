@@ -8,6 +8,7 @@
 		html, body { height: 100%; }
 	</style>
 	<script src="Main.js"></script>
+	<script src="gamepadPort.js"></script>
 </head>
 <body>
 	<div id="elm"></div>
@@ -24,6 +25,7 @@
 	window.addEventListener("resize", () =>
 		app.ports.resizes.send(layoutViewportSize())
 	);
+	addGamepadPort(app);
 	</script>
 </body>
 </html>

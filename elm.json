@@ -11,12 +11,15 @@
             "elm/html": "1.0.0",
             "elm/svg": "1.0.0",
             "elm/time": "1.0.0",
-            "ohanhi/keyboard": "1.0.0"
+            "ohanhi/keyboard": "1.0.0",
+            "xarvh/elm-gamepad": "2.0.0"
         },
         "indirect": {
             "elm/json": "1.0.0",
+            "elm/regex": "1.0.0",
             "elm/url": "1.0.0",
-            "elm/virtual-dom": "1.0.0"
+            "elm/virtual-dom": "1.0.0",
+            "elm-community/list-extra": "8.0.0"
         }
     },
     "test-dependencies": {
