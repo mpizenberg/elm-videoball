@@ -153,9 +153,9 @@ allCollisions endTime ({ player1, player2, player3, player4 } as gameState) =
 
         allBullets =
             Dict.values (Dict.map (triple Un) gameState.bullets1)
-                |> reverseAppend (Dict.values (Dict.map (triple Deux) gameState.bullets2))
-                |> reverseAppend (Dict.values (Dict.map (triple Trois) gameState.bullets3))
-                |> reverseAppend (Dict.values (Dict.map (triple Quatre) gameState.bullets4))
+                |> reversePrepend (Dict.values (Dict.map (triple Deux) gameState.bullets2))
+                |> reversePrepend (Dict.values (Dict.map (triple Trois) gameState.bullets3))
+                |> reversePrepend (Dict.values (Dict.map (triple Quatre) gameState.bullets4))
 
         allBalls =
             case gameState.balls of
@@ -172,14 +172,14 @@ allCollisions endTime ({ player1, player2, player3, player4 } as gameState) =
                     [ ( One, ball1 ), ( Two, ball2 ), ( Three, ball3 ) ]
     in
     Collision.playerPlayerAll duration player1 player2 player3 player4
-        -- |> reverseAppend (Collision.playerWallAll duration player1 player2 player3 player4)
-        -- |> reverseAppend (Collision.playerBulletAll duration player1 player2 player3 player4 allBullets)
-        -- |> reverseAppend (Collision.playerBallAll duration player1 player2 player3 player4 allBalls)
-        -- |> reverseAppend (Collision.bulletBulletAll duration allBullets)
-        -- |> reverseAppend (Collision.bulletBallAll duration allBullets allBalls)
-        -- |> reverseAppend (Collision.ballBallAll duration allBalls)
-        -- |> reverseAppend (Collision.ballWallAll duration allBalls)
-        |> reverseAppend (Collision.bulletWallAll duration allBullets)
+        -- |> reversePrepend (Collision.playerWallAll duration player1 player2 player3 player4)
+        -- |> reversePrepend (Collision.playerBulletAll duration player1 player2 player3 player4 allBullets)
+        -- |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBalls)
+        -- |> reversePrepend (Collision.bulletBulletAll duration allBullets)
+        -- |> reversePrepend (Collision.bulletBallAll duration allBullets allBalls)
+        -- |> reversePrepend (Collision.ballBallAll duration allBalls)
+        -- |> reversePrepend (Collision.ballWallAll duration allBalls)
+        |> reversePrepend (Collision.bulletWallAll duration allBullets)
 
 
 triple : a -> b -> c -> ( a, b, c )
@@ -187,14 +187,14 @@ triple a b c =
     ( a, b, c )
 
 
-reverseAppend : List a -> List a -> List a
-reverseAppend list1 list2 =
+reversePrepend : List a -> List a -> List a
+reversePrepend list1 list2 =
     case list1 of
         [] ->
             list2
 
         l :: ls ->
-            reverseAppend ls (l :: list2)
+            reversePrepend ls (l :: list2)
 
 
 
