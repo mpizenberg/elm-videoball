@@ -38,8 +38,8 @@ type OneOfThree
 --
 
 
-playerPlayerAll : Time.Posix -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
-playerPlayerAll endTime p1 p2 p3 p4 =
+playerPlayerAll : Int -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
+playerPlayerAll duration p1 p2 p3 p4 =
     -- no collision between players
     []
 
@@ -48,8 +48,8 @@ playerPlayerAll endTime p1 p2 p3 p4 =
 --
 
 
-playerWallAll : Time.Posix -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
-playerWallAll endTime p1 p2 p3 p4 =
+playerWallAll : Int -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
+playerWallAll duration p1 p2 p3 p4 =
     Debug.todo "playerWallAll"
 
 
@@ -57,8 +57,8 @@ playerWallAll endTime p1 p2 p3 p4 =
 --
 
 
-playerBulletAll : Time.Posix -> Player -> Player -> Player -> Player -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
-playerBulletAll endTime p1 p2 p3 p4 bullets =
+playerBulletAll : Int -> Player -> Player -> Player -> Player -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
+playerBulletAll duration p1 p2 p3 p4 bullets =
     Debug.todo "playerBulletAll"
 
 
@@ -66,8 +66,8 @@ playerBulletAll endTime p1 p2 p3 p4 bullets =
 --
 
 
-playerBallAll : Time.Posix -> Player -> Player -> Player -> Player -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
-playerBallAll endTime p1 p2 p3 p4 balls =
+playerBallAll : Int -> Player -> Player -> Player -> Player -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+playerBallAll duration p1 p2 p3 p4 balls =
     Debug.todo "playerBallAll"
 
 
@@ -75,8 +75,8 @@ playerBallAll endTime p1 p2 p3 p4 balls =
 --
 
 
-bulletBulletAll : Time.Posix -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
-bulletBulletAll endTime bullets =
+bulletBulletAll : Int -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
+bulletBulletAll duration bullets =
     Debug.todo "bulletBulletAll"
 
 
@@ -84,22 +84,47 @@ bulletBulletAll endTime bullets =
 -- bullets with walls
 
 
-bulletWallAll : Time.Posix -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
-bulletWallAll endTime bullets =
-    List.filterMap (collideWithWall endTime) bullets
+bulletWallAll : Int -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
+bulletWallAll duration bullets =
+    List.map (collideWithWalls duration) bullets
+        |> List.foldl reverseAppend []
 
 
-collideWithWall : Time.Posix -> ( OneOfFour, Int, Bullet ) -> Maybe { time : Float, kind : Kind }
-collideWithWall endTime ( oneOfFour, id, bullet ) =
-    Nothing
+collideWithWalls : Int -> ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
+collideWithWalls duration ( oneOfFour, id, bullet ) =
+    let
+        ( x, y ) =
+            bullet.pos
+
+        ( radius, vX, vY ) =
+            Bullet.radiusAndSpeed bullet
+
+        leftTime =
+            timeOfCollideWithLeftWall radius x vX
+                |> makeCollisionIfLowerThan duration (BulletWall ( oneOfFour, id ) Field.Left)
+
+        rightTime =
+            timeOfCollideWithRightWall radius x vX
+                |> makeCollisionIfLowerThan duration (BulletWall ( oneOfFour, id ) Field.Right)
+
+        topTime =
+            timeOfCollideWithTopWall radius y vY
+                |> makeCollisionIfLowerThan duration (BulletWall ( oneOfFour, id ) Field.Top)
+
+        bottomTime =
+            timeOfCollideWithBottomWall radius y vY
+                |> makeCollisionIfLowerThan duration (BulletWall ( oneOfFour, id ) Field.Bottom)
+    in
+    [ leftTime, rightTime, topTime, bottomTime ]
+        |> List.filterMap identity
 
 
 
 --
 
 
-bulletBallAll : Time.Posix -> List ( OneOfFour, Int, Bullet ) -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
-bulletBallAll endTime bullets balls =
+bulletBallAll : Int -> List ( OneOfFour, Int, Bullet ) -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+bulletBallAll duration bullets balls =
     Debug.todo "bulletBallAll"
 
 
@@ -107,8 +132,8 @@ bulletBallAll endTime bullets balls =
 --
 
 
-ballBallAll : Time.Posix -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
-ballBallAll endTime balls =
+ballBallAll : Int -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+ballBallAll duration balls =
     Debug.todo "ballBallAll"
 
 
@@ -116,9 +141,52 @@ ballBallAll endTime balls =
 --
 
 
-ballWallAll : Time.Posix -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
-ballWallAll endTime balls =
+ballWallAll : Int -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+ballWallAll duration balls =
     Debug.todo "ballWallAll"
+
+
+
+--
+
+
+makeCollisionIfLowerThan : Int -> Kind -> Float -> Maybe { time : Float, kind : Kind }
+makeCollisionIfLowerThan duration kind collisionTime =
+    if collisionTime >= 0 && collisionTime <= toFloat duration then
+        Just { time = collisionTime, kind = kind }
+
+    else
+        Nothing
+
+
+timeOfCollideWithLeftWall : Float -> Float -> Float -> Float
+timeOfCollideWithLeftWall radius x vX =
+    (radius - x) / vX
+
+
+timeOfCollideWithRightWall : Float -> Float -> Float -> Float
+timeOfCollideWithRightWall radius x vX =
+    (Field.width - radius - x) / vX
+
+
+timeOfCollideWithTopWall : Float -> Float -> Float -> Float
+timeOfCollideWithTopWall radius y vY =
+    (radius - y) / vY
+
+
+timeOfCollideWithBottomWall : Float -> Float -> Float -> Float
+timeOfCollideWithBottomWall radius y vY =
+    (Field.height - radius - y) / vY
+
+
+reverseAppend : List a -> List a -> List a
+reverseAppend list1 list2 =
+    case list1 of
+        [] ->
+            list2
+
+        l :: ls ->
+            reverseAppend ls (l :: list2)
 
 
 

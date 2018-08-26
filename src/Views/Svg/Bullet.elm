@@ -9,13 +9,13 @@ view : Bullet -> Svg msg
 view bullet =
     case bullet.size of
         Bullet.Small ->
-            viewTriangle 40 bullet.direction bullet.pos
+            viewTriangle Bullet.smallSize bullet.direction bullet.pos
 
         Bullet.Medium ->
-            viewTriangle 60 bullet.direction bullet.pos
+            viewTriangle Bullet.mediumSize bullet.direction bullet.pos
 
         Bullet.Big ->
-            viewTriangle 80 bullet.direction bullet.pos
+            viewTriangle Bullet.bigSize bullet.direction bullet.pos
 
 
 viewTriangle : Float -> Float -> ( Float, Float ) -> Svg msg

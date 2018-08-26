@@ -14,6 +14,19 @@ type Size
     | Big
 
 
+radiusAndSpeed : Bullet -> ( Float, Float, Float )
+radiusAndSpeed bullet =
+    case bullet.size of
+        Small ->
+            ( smallSize, smallSpeed * cos bullet.direction, smallSpeed * sin bullet.direction )
+
+        Medium ->
+            ( mediumSize, mediumSpeed * cos bullet.direction, mediumSpeed * sin bullet.direction )
+
+        Big ->
+            ( bigSize, bigSpeed * cos bullet.direction, bigSpeed * sin bullet.direction )
+
+
 new : Size -> Float -> ( Float, Float ) -> Bullet
 new =
     Bullet
@@ -23,28 +36,13 @@ move : Int -> Bullet -> Bullet
 move duration bullet =
     case bullet.size of
         Small ->
-            moveSmall duration bullet
+            moveAtSpeed smallSpeed duration bullet
 
         Medium ->
-            moveMedium duration bullet
+            moveAtSpeed mediumSpeed duration bullet
 
         Big ->
-            moveBig duration bullet
-
-
-moveSmall : Int -> Bullet -> Bullet
-moveSmall =
-    moveAtSpeed 2.2
-
-
-moveMedium : Int -> Bullet -> Bullet
-moveMedium =
-    moveAtSpeed 1.8
-
-
-moveBig : Int -> Bullet -> Bullet
-moveBig =
-    moveAtSpeed 1.4
+            moveAtSpeed bigSpeed duration bullet
 
 
 moveAtSpeed : Float -> Int -> Bullet -> Bullet
@@ -56,3 +54,37 @@ moveAtSpeed speed duration ({ pos, direction } as bullet) =
             )
     in
     { bullet | pos = newPos }
+
+
+
+-- CONSTANTS
+
+
+smallSpeed : Float
+smallSpeed =
+    2.2
+
+
+mediumSpeed : Float
+mediumSpeed =
+    1.8
+
+
+bigSpeed : Float
+bigSpeed =
+    1.4
+
+
+smallSize : Float
+smallSize =
+    40
+
+
+mediumSize : Float
+mediumSize =
+    60
+
+
+bigSize : Float
+bigSize =
+    80

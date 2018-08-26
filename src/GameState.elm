@@ -135,6 +135,7 @@ processCollisionsUntil : Time.Posix -> GameState -> GameState
 processCollisionsUntil endTime gameState =
     allCollisions endTime gameState
         |> List.sortBy .time
+        |> Debug.log "allCollisions"
         |> List.foldl processCollision gameState
 
 
@@ -147,6 +148,9 @@ processCollision { time, kind } gameState =
 allCollisions : Time.Posix -> GameState -> List { time : Float, kind : Collision.Kind }
 allCollisions endTime ({ player1, player2, player3, player4 } as gameState) =
     let
+        duration =
+            Time.posixToMillis endTime - Time.posixToMillis gameState.frameTime
+
         allBullets =
             Dict.values (Dict.map (triple Un) gameState.bullets1)
                 |> reverseAppend (Dict.values (Dict.map (triple Deux) gameState.bullets2))
@@ -167,15 +171,15 @@ allCollisions endTime ({ player1, player2, player3, player4 } as gameState) =
                 ThreeBalls ball1 ball2 ball3 ->
                     [ ( One, ball1 ), ( Two, ball2 ), ( Three, ball3 ) ]
     in
-    Collision.playerPlayerAll endTime player1 player2 player3 player4
-        -- |> reverseAppend (Collision.playerWallAll endTime player1 player2 player3 player4)
-        -- |> reverseAppend (Collision.playerBulletAll endTime player1 player2 player3 player4 allBullets)
-        -- |> reverseAppend (Collision.playerBallAll endTime player1 player2 player3 player4 allBalls)
-        -- |> reverseAppend (Collision.bulletBulletAll endTime allBullets)
-        -- |> reverseAppend (Collision.bulletBallAll endTime allBullets allBalls)
-        -- |> reverseAppend (Collision.ballBallAll endTime allBalls)
-        -- |> reverseAppend (Collision.ballWallAll endTime allBalls)
-        |> reverseAppend (Collision.bulletWallAll endTime allBullets)
+    Collision.playerPlayerAll duration player1 player2 player3 player4
+        -- |> reverseAppend (Collision.playerWallAll duration player1 player2 player3 player4)
+        -- |> reverseAppend (Collision.playerBulletAll duration player1 player2 player3 player4 allBullets)
+        -- |> reverseAppend (Collision.playerBallAll duration player1 player2 player3 player4 allBalls)
+        -- |> reverseAppend (Collision.bulletBulletAll duration allBullets)
+        -- |> reverseAppend (Collision.bulletBallAll duration allBullets allBalls)
+        -- |> reverseAppend (Collision.ballBallAll duration allBalls)
+        -- |> reverseAppend (Collision.ballWallAll duration allBalls)
+        |> reverseAppend (Collision.bulletWallAll duration allBullets)
 
 
 triple : a -> b -> c -> ( a, b, c )
