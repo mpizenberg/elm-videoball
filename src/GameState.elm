@@ -1,7 +1,6 @@
 module GameState exposing (..)
 
 import Collision exposing (OneOfFour(..), OneOfThree(..))
-import Controller.Keyboard as Keyboard
 import Dict exposing (Dict)
 import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
@@ -66,8 +65,8 @@ type alias Four a =
     }
 
 
-update : Time.Posix -> Int -> List Keyboard.Key -> Four Player.Control -> GameState -> GameState
-update newFrameTime duration keys playerControls gameState =
+update : Time.Posix -> Int -> Four Player.Control -> GameState -> GameState
+update newFrameTime duration playerControls gameState =
     let
         newDirections =
             { one = Maybe.withDefault gameState.player1.direction playerControls.one.thrusting

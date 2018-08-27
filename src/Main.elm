@@ -8,7 +8,6 @@ import GameState exposing (Four, GameState)
 import Gamepad exposing (Gamepad)
 import Html exposing (Html)
 import Html.Attributes
-import Keyboard
 import Physical.Ball
 import Physical.Bullet
 import Physical.Field
@@ -48,15 +47,12 @@ type alias Model =
     , frameSize : Size
     , frameTime : Time.Posix
     , game : GameState
-    , pressedKeys : List Keyboard.Key
     , playerControls : Four Player.Control
     }
 
 
 type Msg
     = Resizes Size
-    | KeyMsg Keyboard.Msg
-      -- | NewFrame Time.Posix
     | NewGamepadFrame Gamepad.Blob
 
 
@@ -70,7 +66,6 @@ init { time, size } =
       , frameSize = size
       , frameTime = Time.millisToPosix gamepadTime
       , game = GameState.init (Time.millisToPosix gamepadTime)
-      , pressedKeys = []
       , playerControls =
             { one = Player.Control Nothing False
             , two = Player.Control Nothing False
@@ -86,7 +81,6 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Ports.resizes Resizes
-        , Sub.map KeyMsg Keyboard.subscriptions
 
         -- , Browser.Events.onAnimationFrame NewFrame
         , Ports.gamepad NewGamepadFrame
@@ -117,35 +111,8 @@ update msg model =
                 | frameSize = model.size
                 , frameTime = newFrameTime
                 , playerControls = newPlayerControls
-                , game = GameState.update newFrameTime duration model.pressedKeys newPlayerControls model.game
+                , game = GameState.update newFrameTime duration newPlayerControls model.game
               }
-            , Cmd.none
-            )
-
-        -- NewFrame time ->
-        --     let
-        --         duration =
-        --             Time.posixToMillis time - Time.posixToMillis model.frameTime
-        --     in
-        --     ( { model
-        --         | frameSize = model.size
-        --         , frameTime = time
-        --         , game = GameState.update model.frameTime duration model.pressedKeys model.game
-        --       }
-        --     , Cmd.none
-        --     )
-        KeyMsg keyMsg ->
-            let
-                parser =
-                    Keyboard.oneOf
-                        [ Keyboard.whitespaceKey
-                        , Keyboard.navigationKey
-                        ]
-
-                pressedKeys =
-                    Keyboard.updateWithParser parser keyMsg model.pressedKeys
-            in
-            ( { model | pressedKeys = pressedKeys }
             , Cmd.none
             )
 
