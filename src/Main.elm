@@ -1,7 +1,6 @@
 module Main exposing (..)
 
 import Browser
-import Browser.Events
 import Controller.Gamepad as Gamepad exposing (Gamepad)
 import Data.Game as Game exposing (Game)
 import Data.Helper exposing (Four)
@@ -119,27 +118,6 @@ view { frameSize, frameTime, game } =
         , Html.Attributes.style "flex-direction" "column"
         , Html.Attributes.style "height" "100%"
         ]
-        [ viewGameScore game.score game.startTime frameTime
-        , Views.Svg.Game.viewGameField frameSize game
-        ]
-
-
-viewGameScore : ( Int, Int ) -> Time.Posix -> Time.Posix -> Html Msg
-viewGameScore ( score1, score2 ) startTime frameTime =
-    let
-        durationInMillis =
-            Time.posixToMillis frameTime - Time.posixToMillis startTime
-
-        durationInSeconds =
-            durationInMillis // 1000
-    in
-    Html.p [ Html.Attributes.style "height" "50px" ]
-        [ Html.text <|
-            String.concat
-                [ String.fromInt score1
-                , " --- "
-                , String.fromInt durationInSeconds
-                , " --- "
-                , String.fromInt score1
-                ]
+        [ Views.Svg.Game.viewScore game.score game.startTime frameTime
+        , Views.Svg.Game.viewField frameSize game
         ]
