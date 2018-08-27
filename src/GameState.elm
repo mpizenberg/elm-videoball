@@ -6,7 +6,6 @@ import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
 import Physical.Field as Field
 import Physical.Player as Player exposing (Player)
-import SideEffect exposing (SideEffect)
 import Time
 
 

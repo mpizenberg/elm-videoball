@@ -2,22 +2,14 @@ module Main exposing (..)
 
 import Browser
 import Browser.Events
-import Collision
-import Computation
 import GameState exposing (Four, GameState)
 import Gamepad exposing (Gamepad)
 import Html exposing (Html)
 import Html.Attributes
-import Physical.Ball
-import Physical.Bullet
-import Physical.Field
 import Physical.Player as Player
 import Ports
 import Time
-import Views.Svg.Bullet
-import Views.Svg.Field
 import Views.Svg.Game
-import Views.Svg.Player
 
 
 main : Program Flags Model Msg
