@@ -1,5 +1,6 @@
-module Collision exposing (..)
+module Processing.Collision exposing (..)
 
+import Data.Helper exposing (OneOfFour(..), OneOfThree(..))
 import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
 import Physical.Field as Field
@@ -19,19 +20,6 @@ type Kind
       -- balls
     | BallBall OneOfThree OneOfThree
     | BallWall OneOfThree Field.Wall
-
-
-type OneOfFour
-    = Un
-    | Deux
-    | Trois
-    | Quatre
-
-
-type OneOfThree
-    = One
-    | Two
-    | Three
 
 
 

@@ -1,4 +1,4 @@
-module Computation exposing (..)
+module Data.Computation exposing (..)
 
 
 type alias Computation state result =

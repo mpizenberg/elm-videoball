@@ -1,4 +1,4 @@
-module SideEffect
+module Data.SideEffect
     exposing
         ( SideEffect
         , combine

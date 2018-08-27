@@ -2,7 +2,8 @@ module Main exposing (..)
 
 import Browser
 import Browser.Events
-import GameState exposing (Four, GameState)
+import Data.Game as Game exposing (Game)
+import Data.Helper exposing (Four)
 import Gamepad exposing (Gamepad)
 import Html exposing (Html)
 import Html.Attributes
@@ -38,7 +39,7 @@ type alias Model =
     { size : Size
     , frameSize : Size
     , frameTime : Time.Posix
-    , game : GameState
+    , game : Game
     , playerControls : Four Player.Control
     }
 
@@ -57,7 +58,7 @@ init { time, size } =
     ( { size = size
       , frameSize = size
       , frameTime = Time.millisToPosix gamepadTime
-      , game = GameState.init (Time.millisToPosix gamepadTime)
+      , game = Game.init (Time.millisToPosix gamepadTime)
       , playerControls =
             { one = Player.Control Nothing False
             , two = Player.Control Nothing False
@@ -73,8 +74,6 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Ports.resizes Resizes
-
-        -- , Browser.Events.onAnimationFrame NewFrame
         , Ports.gamepad NewGamepadFrame
         ]
 
@@ -103,7 +102,7 @@ update msg model =
                 | frameSize = model.size
                 , frameTime = newFrameTime
                 , playerControls = newPlayerControls
-                , game = GameState.update newFrameTime duration newPlayerControls model.game
+                , game = Game.update newFrameTime duration newPlayerControls model.game
               }
             , Cmd.none
             )
