@@ -2,9 +2,9 @@ module Main exposing (..)
 
 import Browser
 import Browser.Events
+import Controller.Gamepad as Gamepad exposing (Gamepad)
 import Data.Game as Game exposing (Game)
 import Data.Helper exposing (Four)
-import Gamepad exposing (Gamepad)
 import Html exposing (Html)
 import Html.Attributes
 import Physical.Player as Player
@@ -93,10 +93,10 @@ update msg model =
                     Time.posixToMillis newFrameTime - Time.posixToMillis model.frameTime
 
                 gamepads =
-                    Gamepad.getGamepads Gamepad.emptyUserMappings blob
+                    Gamepad.getGamepads blob
 
                 newPlayerControls =
-                    List.foldl gamepadToPlayerControlAcc model.playerControls gamepads
+                    Gamepad.updatePlayerControls gamepads model.playerControls
             in
             ( { model
                 | frameSize = model.size
@@ -106,43 +106,6 @@ update msg model =
               }
             , Cmd.none
             )
-
-
-gamepadToPlayerControlAcc : Gamepad -> Four Player.Control -> Four Player.Control
-gamepadToPlayerControlAcc gamepad controls =
-    case Gamepad.getIndex gamepad of
-        1 ->
-            { controls | one = gamepadToPlayerControl gamepad }
-
-        2 ->
-            { controls | two = gamepadToPlayerControl gamepad }
-
-        3 ->
-            { controls | three = gamepadToPlayerControl gamepad }
-
-        4 ->
-            { controls | four = gamepadToPlayerControl gamepad }
-
-        _ ->
-            controls
-
-
-gamepadToPlayerControl : Gamepad -> Player.Control
-gamepadToPlayerControl gamepad =
-    let
-        stick =
-            Gamepad.leftStickPosition gamepad
-
-        thrusting =
-            if stick.x == 0 && stick.y == 0 then
-                Nothing
-
-            else
-                Just (atan2 -stick.y stick.x)
-    in
-    { holdingShot = Gamepad.isPressed gamepad Gamepad.A
-    , thrusting = thrusting
-    }
 
 
 
