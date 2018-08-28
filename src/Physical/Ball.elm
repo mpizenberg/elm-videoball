@@ -1,4 +1,8 @@
-module Physical.Ball exposing (..)
+module Physical.Ball
+    exposing
+        ( Ball
+        , init
+        )
 
 import Time
 

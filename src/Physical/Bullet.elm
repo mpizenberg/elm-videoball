@@ -1,4 +1,14 @@
-module Physical.Bullet exposing (..)
+module Physical.Bullet
+    exposing
+        ( Bullet
+        , Size(..)
+        , bigSize
+        , mediumSize
+        , move
+        , new
+        , radiusAndSpeed
+        , smallSize
+        )
 
 
 type alias Bullet =

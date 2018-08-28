@@ -1,4 +1,7 @@
-module Views.Svg.Player exposing (..)
+module Views.Svg.Player
+    exposing
+        ( view
+        )
 
 import Physical.Player as Player exposing (Player, size)
 import Svg exposing (Svg)

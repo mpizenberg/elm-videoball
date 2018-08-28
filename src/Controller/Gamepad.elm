@@ -1,4 +1,11 @@
-module Controller.Gamepad exposing (..)
+module Controller.Gamepad
+    exposing
+        ( Blob
+        , Gamepad
+        , animationFrameTimestamp
+        , getGamepads
+        , updatePlayerControls
+        )
 
 import Data.Helper exposing (Four)
 import Gamepad

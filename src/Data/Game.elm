@@ -1,4 +1,12 @@
-module Data.Game exposing (..)
+module Data.Game
+    exposing
+        ( Balls(..)
+        , Game
+        , allBullets
+        , allPlayers
+        , init
+        , update
+        )
 
 import Data.Helper exposing (Four, OneOfFour(..), OneOfThree(..))
 import Dict exposing (Dict)

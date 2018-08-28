@@ -1,4 +1,15 @@
-module Physical.Player exposing (..)
+module Physical.Player
+    exposing
+        ( Control
+        , HasShot(..)
+        , Player
+        , checkWallObstacle
+        , init
+        , moveUntil
+        , prepareMovement
+        , size
+        , updateShot
+        )
 
 import Time
 

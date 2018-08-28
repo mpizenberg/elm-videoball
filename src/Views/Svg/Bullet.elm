@@ -1,4 +1,7 @@
-module Views.Svg.Bullet exposing (..)
+module Views.Svg.Bullet
+    exposing
+        ( view
+        )
 
 import Physical.Bullet as Bullet exposing (Bullet)
 import Svg exposing (Svg)

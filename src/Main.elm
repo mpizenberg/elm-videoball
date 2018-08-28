@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
 import Controller.Gamepad as Gamepad exposing (Gamepad)

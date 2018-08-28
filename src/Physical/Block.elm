@@ -1,4 +1,8 @@
-module Physical.Block exposing (..)
+module Physical.Block
+    exposing
+        ( Block
+        , init
+        )
 
 {-| Protecting blocks.
 -}
