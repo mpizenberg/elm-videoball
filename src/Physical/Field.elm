@@ -1,6 +1,7 @@
 module Physical.Field
     exposing
         ( Wall(..)
+        , center
         , height
         , placePlayer1
         , placePlayer2
@@ -25,6 +26,11 @@ width =
 height : Float
 height =
     1600
+
+
+center : ( Float, Float )
+center =
+    ( width / 2, height / 2 )
 
 
 playerPadding : Float

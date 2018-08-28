@@ -2,6 +2,7 @@ module Data.Game
     exposing
         ( Balls(..)
         , Game
+        , allBalls
         , allBullets
         , allPlayers
         , init
@@ -36,10 +37,20 @@ type alias Game =
 
 
 type Balls
-    = NoBall Time.Posix
-    | OneBall Time.Posix Ball
-    | TwoBalls Time.Posix Ball Ball
-    | ThreeBalls Ball Ball Ball
+    = NoBall BallTimer
+    | OneBall BallTimer BallState
+    | TwoBalls BallTimer BallState BallState
+    | ThreeBalls BallState BallState BallState
+
+
+type BallTimer
+    = WaitingPreviousToMove
+    | FreeSince Time.Posix
+
+
+type BallState
+    = OutOfGoal Ball
+    | InGoal Ball
 
 
 init : Time.Posix -> Game
@@ -56,7 +67,7 @@ init startTime =
     , bullets2 = Dict.empty
     , bullets3 = Dict.empty
     , bullets4 = Dict.empty
-    , balls = NoBall startTime
+    , balls = NoBall (FreeSince startTime)
     }
 
 
@@ -68,6 +79,11 @@ allPlayers { player1, player2, player3, player4 } =
 allBullets : Game -> List (Dict Int Bullet)
 allBullets { bullets1, bullets2, bullets3, bullets4 } =
     [ bullets1, bullets2, bullets3, bullets4 ]
+
+
+allBalls : Game -> List Ball
+allBalls { balls } =
+    ballsListAcc balls []
 
 
 update : Time.Posix -> Int -> Four Player.Control -> Game -> Game
@@ -95,6 +111,7 @@ update newFrameTime duration playerControls game =
             }
     in
     game
+        |> changeGameBalls newFrameTime
         |> preparePlayers duration newDirections newThrustings
         |> processCollisionsUntil newFrameTime
         |> moveAllUntil newFrameTime
@@ -181,7 +198,7 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
                 |> reversePrepend (Dict.values (Dict.map (triple Trois) game.bullets3))
                 |> reversePrepend (Dict.values (Dict.map (triple Quatre) game.bullets4))
 
-        allBalls =
+        allBallsWithId =
             case game.balls of
                 NoBall _ ->
                     []
@@ -198,11 +215,11 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
     Collision.playerPlayerAll duration player1 player2 player3 player4
         -- |> reversePrepend (Collision.playerWallAll duration player1 player2 player3 player4)
         -- |> reversePrepend (Collision.playerBulletAll duration player1 player2 player3 player4 allBulletsList)
-        -- |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBalls)
+        -- |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBallsWithId)
         -- |> reversePrepend (Collision.bulletBulletAll duration allBulletsList)
-        -- |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBalls)
-        -- |> reversePrepend (Collision.ballBallAll duration allBalls)
-        -- |> reversePrepend (Collision.ballWallAll duration allBalls)
+        -- |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBallsWithId)
+        -- |> reversePrepend (Collision.ballBallAll duration allBallsWithId)
+        -- |> reversePrepend (Collision.ballWallAll duration allBallsWithId)
         |> reversePrepend (Collision.bulletWallAll duration allBulletsList)
 
 
@@ -336,3 +353,113 @@ updateBullets frameId hasShot player bullets =
 spawnPlayerBullet : Int -> Player -> Bullet
 spawnPlayerBullet _ player =
     Bullet.new Bullet.Small player.direction player.pos
+
+
+
+-- MANAGING BALLS ####################################################
+
+
+changeGameBalls : Time.Posix -> Game -> Game
+changeGameBalls newFrameTime game =
+    let
+        newBalls =
+            game.balls
+                |> Debug.log "game.balls"
+                |> checkStartBallCounter newFrameTime
+                |> checkSpawnBall newFrameTime
+    in
+    { game | balls = newBalls }
+
+
+checkSpawnBall : Time.Posix -> Balls -> Balls
+checkSpawnBall frameTime balls =
+    case balls of
+        NoBall (FreeSince counterStartTime) ->
+            if timeDiff counterStartTime frameTime > ballTimer then
+                OneBall WaitingPreviousToMove (OutOfGoal newBall)
+
+            else
+                balls
+
+        OneBall (FreeSince counterStartTime) ballState ->
+            if timeDiff counterStartTime frameTime > ballTimer then
+                TwoBalls WaitingPreviousToMove (OutOfGoal newBall) ballState
+
+            else
+                balls
+
+        TwoBalls (FreeSince counterStartTime) ballState1 ballState2 ->
+            if timeDiff counterStartTime frameTime > ballTimer then
+                ThreeBalls (OutOfGoal newBall) ballState1 ballState2
+
+            else
+                balls
+
+        _ ->
+            balls
+
+
+checkStartBallCounter : Time.Posix -> Balls -> Balls
+checkStartBallCounter frameTime balls =
+    case balls of
+        OneBall WaitingPreviousToMove ((OutOfGoal ball) as ballState) ->
+            if Ball.squareDistanceFrom Field.center ball > Ball.size * Ball.size then
+                OneBall (FreeSince frameTime) ballState
+
+            else
+                balls
+
+        TwoBalls WaitingPreviousToMove ((OutOfGoal ball) as ballState1) ballState2 ->
+            if Ball.squareDistanceFrom Field.center ball > Ball.size * Ball.size then
+                TwoBalls (FreeSince frameTime) ballState1 ballState2
+
+            else
+                balls
+
+        _ ->
+            balls
+
+
+ballTimer : Int
+ballTimer =
+    2000
+
+
+newBall : Ball
+newBall =
+    { pos = Field.center
+    , speed = ( 0, 0 )
+    , superspeed = Nothing
+    }
+
+
+timeDiff : Time.Posix -> Time.Posix -> Int
+timeDiff t1 t2 =
+    Time.posixToMillis t2 - Time.posixToMillis t1
+
+
+ballsListAcc : Balls -> List Ball -> List Ball
+ballsListAcc balls acc =
+    case balls of
+        OneBall _ (OutOfGoal ball) ->
+            ball :: acc
+
+        TwoBalls _ (OutOfGoal ball1) ballState2 ->
+            ballsListAcc (OneBall noTimer ballState2) (ball1 :: acc)
+
+        TwoBalls _ _ ballState2 ->
+            ballsListAcc (OneBall noTimer ballState2) acc
+
+        ThreeBalls (OutOfGoal ball1) ballState2 ballState3 ->
+            ballsListAcc (TwoBalls noTimer ballState2 ballState3) (ball1 :: acc)
+
+        ThreeBalls _ ballState2 ballState3 ->
+            ballsListAcc (TwoBalls noTimer ballState2 ballState3) acc
+
+        _ ->
+            acc
+
+
+noTimer : BallTimer
+noTimer =
+    WaitingPreviousToMove

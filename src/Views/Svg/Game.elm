@@ -11,6 +11,7 @@ import Html.Attributes
 import Physical.Bullet exposing (Bullet)
 import Svg exposing (Svg)
 import Time
+import Views.Svg.Ball
 import Views.Svg.Bullet
 import Views.Svg.Field
 import Views.Svg.Player
@@ -49,9 +50,14 @@ viewField frameSize game =
             Game.allBullets game
                 |> List.map bulletsDictToSvg
                 |> Svg.g []
+
+        balls =
+            Game.allBalls game
+                |> List.map Views.Svg.Ball.view
+                |> Svg.g []
     in
     Views.Svg.Field.view
-        [ Views.Svg.Field.background, bullets, players ]
+        [ Views.Svg.Field.background, balls, bullets, players ]
 
 
 bulletsDictToSvg : Dict Int Bullet -> Svg msg

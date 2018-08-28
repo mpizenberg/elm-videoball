@@ -2,9 +2,16 @@ module Physical.Ball
     exposing
         ( Ball
         , init
+        , size
+        , squareDistanceFrom
         )
 
 import Time
+
+
+size : Float
+size =
+    80
 
 
 type alias Ball =
@@ -20,3 +27,15 @@ init =
     , speed = ( 0, 0 )
     , superspeed = Nothing
     }
+
+
+squareDistanceFrom : ( Float, Float ) -> Ball -> Float
+squareDistanceFrom ( x, y ) { pos } =
+    let
+        dx =
+            Tuple.first pos - x
+
+        dy =
+            Tuple.second pos - y
+    in
+    dx * dx + dy * dy
