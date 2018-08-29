@@ -53,6 +53,16 @@ type BallState
     | InGoal Ball
 
 
+unwrapBall : BallState -> Ball
+unwrapBall ballState =
+    case ballState of
+        OutOfGoal ball ->
+            ball
+
+        InGoal ball ->
+            ball
+
+
 init : Time.Posix -> Game
 init startTime =
     { startTime = startTime
@@ -163,7 +173,7 @@ processCollisionsUntil : Time.Posix -> Game -> Game
 processCollisionsUntil endTime game =
     allCollisions endTime game
         |> List.sortBy .time
-        -- |> Debug.log "allCollisions"
+        |> Debug.log "allCollisions"
         |> List.foldl processCollision game
 
 
@@ -204,20 +214,20 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
                     []
 
                 OneBall _ ball ->
-                    [ ( One, ball ) ]
+                    [ ( One, unwrapBall ball ) ]
 
                 TwoBalls _ ball1 ball2 ->
-                    [ ( One, ball1 ), ( Two, ball2 ) ]
+                    [ ( One, unwrapBall ball1 ), ( Two, unwrapBall ball2 ) ]
 
                 ThreeBalls ball1 ball2 ball3 ->
-                    [ ( One, ball1 ), ( Two, ball2 ), ( Three, ball3 ) ]
+                    [ ( One, unwrapBall ball1 ), ( Two, unwrapBall ball2 ), ( Three, unwrapBall ball3 ) ]
     in
     Collision.playerPlayerAll duration player1 player2 player3 player4
         -- |> reversePrepend (Collision.playerWallAll duration player1 player2 player3 player4)
         -- |> reversePrepend (Collision.playerBulletAll duration player1 player2 player3 player4 allBulletsList)
         -- |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBallsWithId)
         -- |> reversePrepend (Collision.bulletBulletAll duration allBulletsList)
-        -- |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBallsWithId)
+        |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBallsWithId)
         -- |> reversePrepend (Collision.ballBallAll duration allBallsWithId)
         -- |> reversePrepend (Collision.ballWallAll duration allBallsWithId)
         |> reversePrepend (Collision.bulletWallAll duration allBulletsList)
@@ -364,7 +374,7 @@ changeGameBalls newFrameTime game =
     let
         newBalls =
             game.balls
-                |> Debug.log "game.balls"
+                -- |> Debug.log "game.balls"
                 |> checkStartBallCounter newFrameTime
                 |> checkSpawnBall newFrameTime
     in

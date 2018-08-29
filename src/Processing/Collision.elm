@@ -1,6 +1,7 @@
 module Processing.Collision
     exposing
         ( Kind(..)
+        , bulletBallAll
         , bulletWallAll
         , playerPlayerAll
         )
@@ -113,12 +114,71 @@ collideWithWalls duration ( oneOfFour, id, bullet ) =
 
 
 
---
+-- bullets with balls
 
 
 bulletBallAll : Int -> List ( OneOfFour, Int, Bullet ) -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
 bulletBallAll duration bullets balls =
-    Debug.todo "bulletBallAll"
+    List.map (collideBallWithBullets duration bullets) balls
+        |> List.foldl reverseAppend []
+
+
+collideBallWithBullets : Int -> List ( OneOfFour, Int, Bullet ) -> ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+collideBallWithBullets duration bullets identifiedBall =
+    List.filterMap (collideBallWithBullet duration identifiedBall) bullets
+
+
+collideBallWithBullet : Int -> ( OneOfThree, Ball ) -> ( OneOfFour, Int, Bullet ) -> Maybe { time : Float, kind : Kind }
+collideBallWithBullet duration ( oneOfThree, ball ) ( oneOfFour, id, bullet ) =
+    let
+        ( bulletRadius, bulletSpeedX, bulletSpeedY ) =
+            Bullet.radiusAndSpeed bullet
+
+        a =
+            fromTo ball.speed ( bulletSpeedX, bulletSpeedY )
+
+        b =
+            fromTo ball.pos bullet.pos
+
+        d =
+            Ball.size + bulletRadius
+
+        -- for t in [0,duration], solve | a * t + b | <= d
+        aa =
+            norm2 a
+
+        bb =
+            norm2 b
+
+        ab =
+            dot a b
+
+        dd =
+            d * d
+
+        discriminant =
+            ab * ab - aa * (bb - dd)
+    in
+    if discriminant < 0 then
+        Nothing
+
+    else
+        let
+            sqDiscriminant =
+                sqrt discriminant
+
+            t1 =
+                (-ab - sqDiscriminant) / aa
+
+            t2 =
+                (-ab + sqDiscriminant) / aa
+        in
+        -- check that [t1,t2] intersects [0,duration]
+        if t2 >= 0 && t1 <= toFloat duration then
+            Just { time = max 0 t1, kind = BulletBall ( oneOfFour, id ) oneOfThree }
+
+        else
+            Nothing
 
 
 
@@ -141,6 +201,25 @@ ballWallAll duration balls =
 
 
 --
+
+
+type alias Pos =
+    ( Float, Float )
+
+
+norm2 : ( Float, Float ) -> Float
+norm2 ( x, y ) =
+    x * x + y * y
+
+
+dot : ( Float, Float ) -> ( Float, Float ) -> Float
+dot ( x1, y1 ) ( x2, y2 ) =
+    x1 * x2 + y1 * y2
+
+
+fromTo : Pos -> Pos -> ( Float, Float )
+fromTo ( x1, y1 ) ( x2, y2 ) =
+    ( x2 - x1, y2 - y1 )
 
 
 makeCollisionIfLowerThan : Int -> Kind -> Float -> Maybe { time : Float, kind : Kind }
@@ -184,10 +263,6 @@ reverseAppend list1 list2 =
 
 
 -- ###################################################################
-
-
-type alias Pos =
-    ( Float, Float )
 
 
 continuousCollision : ( Pos, Pos, Float ) -> ( Pos, Pos, Float ) -> Maybe Float
@@ -244,21 +319,6 @@ continuousCollision ( start1, end1, radius1 ) ( start2, end2, radius2 ) =
 
         else
             Nothing
-
-
-norm2 : ( Float, Float ) -> Float
-norm2 ( x, y ) =
-    x * x + y * y
-
-
-dot : ( Float, Float ) -> ( Float, Float ) -> Float
-dot ( x1, y1 ) ( x2, y2 ) =
-    x1 * x2 + y1 * y2
-
-
-fromTo : Pos -> Pos -> ( Float, Float )
-fromTo ( x1, y1 ) ( x2, y2 ) =
-    ( x2 - x1, y2 - y1 )
 
 
 
