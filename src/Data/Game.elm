@@ -180,6 +180,7 @@ processCollisionsUntil endTime game =
 processCollision : { time : Float, kind : Collision.Kind } -> Game -> Game
 processCollision { time, kind } game =
     case kind of
+        -- bullet - wall
         Collision.BulletWall ( Un, id ) _ ->
             { game | bullets1 = Dict.remove id game.bullets1 }
 
@@ -190,6 +191,23 @@ processCollision { time, kind } game =
             { game | bullets3 = Dict.remove id game.bullets3 }
 
         Collision.BulletWall ( Quatre, id ) _ ->
+            { game | bullets4 = Dict.remove id game.bullets4 }
+
+        -- bullet - ball
+        Collision.BulletBall ( Un, id ) _ ->
+            -- TODO later: if medium size bullet, do not destroy
+            { game | bullets1 = Dict.remove id game.bullets1 }
+
+        Collision.BulletBall ( Deux, id ) _ ->
+            -- TODO later: if medium size bullet, do not destroy
+            { game | bullets2 = Dict.remove id game.bullets2 }
+
+        Collision.BulletBall ( Trois, id ) _ ->
+            -- TODO later: if medium size bullet, do not destroy
+            { game | bullets3 = Dict.remove id game.bullets3 }
+
+        Collision.BulletBall ( Quatre, id ) _ ->
+            -- TODO later: if medium size bullet, do not destroy
             { game | bullets4 = Dict.remove id game.bullets4 }
 
         _ ->
