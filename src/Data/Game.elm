@@ -1,13 +1,12 @@
-module Data.Game
-    exposing
-        ( Balls(..)
-        , Game
-        , allBalls
-        , allBullets
-        , allPlayers
-        , init
-        , update
-        )
+module Data.Game exposing
+    ( Balls(..)
+    , Game
+    , allBalls
+    , allBullets
+    , allPlayers
+    , init
+    , update
+    )
 
 import Data.Helper exposing (Four, OneOfFour(..), OneOfThree(..))
 import Dict exposing (Dict)
@@ -113,14 +112,14 @@ update newFrameTime duration playerControls game =
     let
         newDirections =
             { one = Maybe.withDefault game.player1.direction playerControls.one.thrusting
-            , two = game.player2.direction
+            , two = Maybe.withDefault game.player2.direction playerControls.two.thrusting
             , three = game.player3.direction
             , four = game.player4.direction
             }
 
         newThrustings =
             { one = not (isNothing playerControls.one.thrusting)
-            , two = game.player2.thrusting
+            , two = not (isNothing playerControls.two.thrusting)
             , three = game.player3.thrusting
             , four = game.player4.thrusting
             }
