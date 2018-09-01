@@ -1,13 +1,12 @@
-module Physical.Ball
-    exposing
-        ( Ball
-        , init
-        , moveDuring
-        , moveUntil
-        , prepareMovement
-        , size
-        , squareDistanceFrom
-        )
+module Physical.Ball exposing
+    ( Ball
+    , init
+    , moveDuring
+    , moveUntil
+    , prepareMovement
+    , size
+    , squareDistanceFrom
+    )
 
 import Physical.Field as Field
 import Time

@@ -1,9 +1,8 @@
-module Controller.Keyboard
-    exposing
-        ( Key
-        , getThrustingAndDirection
-        , shootIsPushed
-        )
+module Controller.Keyboard exposing
+    ( Key
+    , getThrustingAndDirection
+    , shootIsPushed
+    )
 
 import Keyboard
 import Keyboard.Arrows as Arrows

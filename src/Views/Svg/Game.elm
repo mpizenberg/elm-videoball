@@ -1,8 +1,7 @@
-module Views.Svg.Game
-    exposing
-        ( viewField
-        , viewScore
-        )
+module Views.Svg.Game exposing
+    ( viewField
+    , viewScore
+    )
 
 import Data.Game as Game exposing (Game)
 import Dict exposing (Dict)

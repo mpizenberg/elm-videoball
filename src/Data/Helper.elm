@@ -1,9 +1,8 @@
-module Data.Helper
-    exposing
-        ( Four
-        , OneOfFour(..)
-        , OneOfThree(..)
-        )
+module Data.Helper exposing
+    ( Four
+    , OneOfFour(..)
+    , OneOfThree(..)
+    )
 
 
 type alias Four a =

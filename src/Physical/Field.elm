@@ -1,14 +1,13 @@
-module Physical.Field
-    exposing
-        ( Wall(..)
-        , center
-        , height
-        , placePlayer1
-        , placePlayer2
-        , placePlayer3
-        , placePlayer4
-        , width
-        )
+module Physical.Field exposing
+    ( Wall(..)
+    , center
+    , height
+    , placePlayer1
+    , placePlayer2
+    , placePlayer3
+    , placePlayer4
+    , width
+    )
 
 
 type Wall

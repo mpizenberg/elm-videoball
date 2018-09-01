@@ -1,10 +1,9 @@
-module Data.SideEffect
-    exposing
-        ( SideEffect
-        , combine
-        , multiple
-        , one
-        )
+module Data.SideEffect exposing
+    ( SideEffect
+    , combine
+    , multiple
+    , one
+    )
 
 
 type SideEffect a

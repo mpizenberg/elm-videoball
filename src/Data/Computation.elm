@@ -1,4 +1,4 @@
-module Data.Computation exposing (..)
+module Data.Computation exposing (Computation, andThen, mapResult, mapState, runFrom, setResult, setState)
 
 
 type alias Computation state result =

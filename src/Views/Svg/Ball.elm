@@ -1,7 +1,4 @@
-module Views.Svg.Ball
-    exposing
-        ( view
-        )
+module Views.Svg.Ball exposing (view)
 
 import Physical.Ball as Ball exposing (Ball)
 import Svg exposing (Svg)

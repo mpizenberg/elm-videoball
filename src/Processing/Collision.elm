@@ -1,10 +1,9 @@
-module Processing.Collision
-    exposing
-        ( Kind(..)
-        , bulletBallAll
-        , bulletWallAll
-        , playerPlayerAll
-        )
+module Processing.Collision exposing
+    ( Kind(..)
+    , bulletBallAll
+    , bulletWallAll
+    , playerPlayerAll
+    )
 
 import Data.Helper exposing (OneOfFour(..), OneOfThree(..))
 import Physical.Ball as Ball exposing (Ball)

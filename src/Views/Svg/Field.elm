@@ -1,8 +1,7 @@
-module Views.Svg.Field
-    exposing
-        ( background
-        , view
-        )
+module Views.Svg.Field exposing
+    ( background
+    , view
+    )
 
 import Html exposing (Html)
 import Html.Attributes

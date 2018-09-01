@@ -1,4 +1,4 @@
-port module Ports exposing (..)
+port module Ports exposing (gamepad, resizes)
 
 import Gamepad
 
