@@ -44,7 +44,8 @@ playerPlayerAll duration p1 p2 p3 p4 =
 
 playerWallAll : Int -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
 playerWallAll duration p1 p2 p3 p4 =
-    Debug.todo "playerWallAll"
+    -- Debug.todo "playerWallAll"
+    []
 
 
 
@@ -53,7 +54,8 @@ playerWallAll duration p1 p2 p3 p4 =
 
 playerBulletAll : Int -> Player -> Player -> Player -> Player -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
 playerBulletAll duration p1 p2 p3 p4 bullets =
-    Debug.todo "playerBulletAll"
+    -- Debug.todo "playerBulletAll"
+    []
 
 
 
@@ -62,7 +64,8 @@ playerBulletAll duration p1 p2 p3 p4 bullets =
 
 playerBallAll : Int -> Player -> Player -> Player -> Player -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
 playerBallAll duration p1 p2 p3 p4 balls =
-    Debug.todo "playerBallAll"
+    -- Debug.todo "playerBallAll"
+    []
 
 
 
@@ -71,7 +74,8 @@ playerBallAll duration p1 p2 p3 p4 balls =
 
 bulletBulletAll : Int -> List ( OneOfFour, Int, Bullet ) -> List { time : Float, kind : Kind }
 bulletBulletAll duration bullets =
-    Debug.todo "bulletBulletAll"
+    -- Debug.todo "bulletBulletAll"
+    []
 
 
 
@@ -187,7 +191,8 @@ collideBallWithBullet duration ( oneOfThree, ball ) ( oneOfFour, id, bullet ) =
 
 ballBallAll : Int -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
 ballBallAll duration balls =
-    Debug.todo "ballBallAll"
+    -- Debug.todo "ballBallAll"
+    []
 
 
 
@@ -196,7 +201,8 @@ ballBallAll duration balls =
 
 ballWallAll : Int -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
 ballWallAll duration balls =
-    Debug.todo "ballWallAll"
+    -- Debug.todo "ballWallAll"
+    []
 
 
 
@@ -408,7 +414,8 @@ check entity ( opensLeftRight, candidatesAcc ) =
     else
         let
             newCandidates =
-                Debug.todo "newCandidates"
+                -- Debug.todo "newCandidates"
+                []
         in
         ( entity :: opensLeftRight, newCandidates )
 
