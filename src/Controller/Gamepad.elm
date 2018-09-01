@@ -1,11 +1,10 @@
-module Controller.Gamepad
-    exposing
-        ( Blob
-        , Gamepad
-        , animationFrameTimestamp
-        , getGamepads
-        , updatePlayerControls
-        )
+module Controller.Gamepad exposing
+    ( Blob
+    , Gamepad
+    , animationFrameTimestamp
+    , getGamepads
+    , updatePlayerControls
+    )
 
 import Data.Helper exposing (Four)
 import Gamepad
@@ -70,7 +69,7 @@ toPlayerControl gamepad =
             Gamepad.leftStickPosition gamepad
 
         thrusting =
-            if stick.x == 0 && stick.y == 0 then
+            if stick.x * stick.x + stick.y * stick.y < deadZone then
                 Nothing
 
             else
@@ -79,3 +78,8 @@ toPlayerControl gamepad =
     { holdingShot = Gamepad.isPressed gamepad Gamepad.A
     , thrusting = thrusting
     }
+
+
+deadZone : Float
+deadZone =
+    0.01
