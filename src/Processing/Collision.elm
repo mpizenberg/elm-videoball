@@ -5,7 +5,7 @@ module Processing.Collision exposing
     , playerPlayerAll
     )
 
-import Data.Helper exposing (OneOfFour(..), OneOfThree(..))
+import Data.Helper exposing (OneOfFour(..))
 import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
 import Physical.Field as Field
@@ -17,14 +17,14 @@ type Kind
     = PlayerPlayer OneOfFour OneOfFour
     | PlayerWall OneOfFour Field.Wall
     | PlayerBullet OneOfFour ( OneOfFour, Int )
-    | PlayerBall OneOfFour OneOfThree
+    | PlayerBall OneOfFour Int
       -- bullets
     | BulletBullet ( OneOfFour, Int ) ( OneOfFour, Int )
     | BulletWall ( OneOfFour, Int ) Field.Wall
-    | BulletBall ( OneOfFour, Int ) OneOfThree
+    | BulletBall ( OneOfFour, Int ) Int
       -- balls
-    | BallBall OneOfThree OneOfThree
-    | BallWall OneOfThree Field.Wall
+    | BallBall Int Int
+    | BallWall Int Field.Wall
 
 
 
@@ -61,7 +61,7 @@ playerBulletAll duration p1 p2 p3 p4 bullets =
 --
 
 
-playerBallAll : Int -> Player -> Player -> Player -> Player -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+playerBallAll : Int -> Player -> Player -> Player -> Player -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
 playerBallAll duration p1 p2 p3 p4 balls =
     -- Debug.todo "playerBallAll"
     []
@@ -120,19 +120,19 @@ collideWithWalls duration ( oneOfFour, id, bullet ) =
 -- bullets with balls
 
 
-bulletBallAll : Int -> List ( OneOfFour, Int, Bullet ) -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+bulletBallAll : Int -> List ( OneOfFour, Int, Bullet ) -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
 bulletBallAll duration bullets balls =
     List.map (collideBallWithBullets duration bullets) balls
         |> List.foldl reverseAppend []
 
 
-collideBallWithBullets : Int -> List ( OneOfFour, Int, Bullet ) -> ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+collideBallWithBullets : Int -> List ( OneOfFour, Int, Bullet ) -> ( Int, Ball ) -> List { time : Float, kind : Kind }
 collideBallWithBullets duration bullets identifiedBall =
     List.filterMap (collideBallWithBullet duration identifiedBall) bullets
 
 
-collideBallWithBullet : Int -> ( OneOfThree, Ball ) -> ( OneOfFour, Int, Bullet ) -> Maybe { time : Float, kind : Kind }
-collideBallWithBullet duration ( oneOfThree, ball ) ( oneOfFour, id, bullet ) =
+collideBallWithBullet : Int -> ( Int, Ball ) -> ( OneOfFour, Int, Bullet ) -> Maybe { time : Float, kind : Kind }
+collideBallWithBullet duration ( ballId, ball ) ( oneOfFour, id, bullet ) =
     let
         ( bulletRadius, bulletSpeedX, bulletSpeedY ) =
             Bullet.radiusAndSpeed bullet
@@ -178,7 +178,7 @@ collideBallWithBullet duration ( oneOfThree, ball ) ( oneOfFour, id, bullet ) =
         in
         -- check that [t1,t2] intersects [0,duration]
         if t2 >= 0 && t1 <= toFloat duration then
-            Just { time = max 0 t1, kind = BulletBall ( oneOfFour, id ) oneOfThree }
+            Just { time = max 0 t1, kind = BulletBall ( oneOfFour, id ) ballId }
 
         else
             Nothing
@@ -188,7 +188,7 @@ collideBallWithBullet duration ( oneOfThree, ball ) ( oneOfFour, id, bullet ) =
 --
 
 
-ballBallAll : Int -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+ballBallAll : Int -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
 ballBallAll duration balls =
     -- Debug.todo "ballBallAll"
     []
@@ -198,7 +198,7 @@ ballBallAll duration balls =
 --
 
 
-ballWallAll : Int -> List ( OneOfThree, Ball ) -> List { time : Float, kind : Kind }
+ballWallAll : Int -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
 ballWallAll duration balls =
     -- Debug.todo "ballWallAll"
     []

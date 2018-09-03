@@ -1,5 +1,5 @@
 module Data.Game exposing
-    ( Balls(..)
+    ( Balls
     , Game
     , allBalls
     , allBullets
@@ -8,7 +8,7 @@ module Data.Game exposing
     , update
     )
 
-import Data.Helper exposing (Four, OneOfFour(..), OneOfThree(..))
+import Data.Helper exposing (Four, OneOfFour(..))
 import Dict exposing (Dict)
 import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
@@ -35,43 +35,16 @@ type alias Game =
     }
 
 
-type Balls
-    = NoBall BallTimer
-    | OneBall BallTimer BallState
-    | TwoBalls BallTimer BallState BallState
-    | ThreeBalls BallState BallState BallState
+type alias Balls =
+    { inGame : Dict Int Ball
+    , incoming : List Int
+    , timer : BallTimer
+    }
 
 
 type BallTimer
-    = WaitingPreviousToMove
+    = WaitingForFreeSpace
     | FreeSince Time.Posix
-
-
-{-| Balls that enters goals areas cannot be removed directly at collision handling.
-Otherwise, changing from a TwoBalls to a OneBall for example
-will screw with the balls id in the rest of the collisions.
-
-This may not be a good idea.
-An alternative would be to have balls in a `Dict Int (Maybe Ball)` ?
-It would make checking for ball creation more complex?
-
-Maybe there is a batter idea!
-Let's discuss if you have one ;)
-
--}
-type BallState
-    = OutOfGoal Ball
-    | InGoal Ball
-
-
-unwrapBall : BallState -> Ball
-unwrapBall ballState =
-    case ballState of
-        OutOfGoal ball ->
-            ball
-
-        InGoal ball ->
-            ball
 
 
 init : Time.Posix -> Game
@@ -88,7 +61,7 @@ init startTime =
     , bullets2 = Dict.empty
     , bullets3 = Dict.empty
     , bullets4 = Dict.empty
-    , balls = NoBall (FreeSince startTime)
+    , balls = Balls Dict.empty [ 0, 1, 2 ] (FreeSince startTime)
     }
 
 
@@ -104,7 +77,7 @@ allBullets { bullets1, bullets2, bullets3, bullets4 } =
 
 allBalls : Game -> List Ball
 allBalls { balls } =
-    ballsListAcc balls []
+    Dict.values balls.inGame
 
 
 update : Time.Posix -> Int -> Four Player.Control -> Game -> Game
@@ -213,8 +186,8 @@ processCollision { time, kind } game =
             game
 
 
-impactIdentifiedBulletOnBall : Float -> ( OneOfFour, Int ) -> OneOfThree -> Game -> Game
-impactIdentifiedBulletOnBall time ( oneOfFour, id ) oneOfThree game =
+impactIdentifiedBulletOnBall : Float -> ( OneOfFour, Int ) -> Int -> Game -> Game
+impactIdentifiedBulletOnBall time ( oneOfFour, id ) ballId game =
     case oneOfFour of
         Un ->
             case Dict.get id game.bullets1 of
@@ -222,43 +195,19 @@ impactIdentifiedBulletOnBall time ( oneOfFour, id ) oneOfThree game =
                     game
 
                 Just bullet ->
-                    let
-                        newGame =
-                            updateBallWithId (impactBulletOnBall time bullet) oneOfThree game
-                    in
-                    { newGame | bullets1 = Dict.remove id newGame.bullets1 }
+                    { game
+                        | bullets1 = Dict.remove id game.bullets1
+                        , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
+                    }
 
         -- TODO treat cases with bullets of players 2, 3 and 4
         _ ->
             game
 
 
-updateBallWithId : (Ball -> Ball) -> OneOfThree -> Game -> Game
-updateBallWithId f oneOfThree game =
-    case ( oneOfThree, game.balls ) of
-        -- Ball 1
-        ( One, OneBall timer (OutOfGoal ball) ) ->
-            { game | balls = OneBall timer (OutOfGoal (f ball)) }
-
-        ( One, TwoBalls timer (OutOfGoal ball1) ballState2 ) ->
-            { game | balls = TwoBalls timer (OutOfGoal (f ball1)) ballState2 }
-
-        ( One, ThreeBalls (OutOfGoal ball1) ballState2 ballState3 ) ->
-            { game | balls = ThreeBalls (OutOfGoal (f ball1)) ballState2 ballState3 }
-
-        -- Ball 2
-        ( Two, TwoBalls timer ballState1 (OutOfGoal ball2) ) ->
-            { game | balls = TwoBalls timer ballState1 (OutOfGoal (f ball2)) }
-
-        ( Two, ThreeBalls ballState1 (OutOfGoal ball2) ballState3 ) ->
-            { game | balls = ThreeBalls ballState1 (OutOfGoal (f ball2)) ballState3 }
-
-        -- Ball 3
-        ( Three, ThreeBalls ballState1 ballState2 (OutOfGoal ball3) ) ->
-            { game | balls = ThreeBalls ballState1 ballState2 (OutOfGoal (f ball3)) }
-
-        _ ->
-            game
+updateBallWithId : (Ball -> Ball) -> Int -> Balls -> Balls
+updateBallWithId f ballId balls =
+    { balls | inGame = Dict.update ballId (Maybe.map f) balls.inGame }
 
 
 impactBulletOnBall : Float -> Bullet -> Ball -> Ball
@@ -272,8 +221,8 @@ impactBulletOnBall time bullet ball =
             movedBall.speed
 
         newSpeed =
-            ( speedX + 1.5 * cos bullet.direction
-            , speedY + 1.5 * sin bullet.direction
+            ( speedX + 0.5 * cos bullet.direction
+            , speedY + 0.5 * sin bullet.direction
             )
     in
     { movedBall | speed = newSpeed }
@@ -292,18 +241,7 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
                 |> reversePrepend (Dict.values (Dict.map (triple Quatre) game.bullets4))
 
         allBallsWithId =
-            case game.balls of
-                NoBall _ ->
-                    []
-
-                OneBall _ ball ->
-                    [ ( One, unwrapBall ball ) ]
-
-                TwoBalls _ ball1 ball2 ->
-                    [ ( One, unwrapBall ball1 ), ( Two, unwrapBall ball2 ) ]
-
-                ThreeBalls ball1 ball2 ball3 ->
-                    [ ( One, unwrapBall ball1 ), ( Two, unwrapBall ball2 ), ( Three, unwrapBall ball3 ) ]
+            Dict.toList game.balls.inGame
     in
     Collision.playerPlayerAll duration player1 player2 player3 player4
         -- |> reversePrepend (Collision.playerWallAll duration player1 player2 player3 player4)
@@ -460,22 +398,7 @@ spawnPlayerBullet _ player =
 -}
 moveBallsUntil : Time.Posix -> Balls -> Balls
 moveBallsUntil newFrameTime balls =
-    let
-        move =
-            Ball.moveUntil newFrameTime
-    in
-    case balls of
-        OneBall timer (OutOfGoal ball) ->
-            OneBall timer (OutOfGoal (move ball))
-
-        TwoBalls timer (OutOfGoal ball1) (OutOfGoal ball2) ->
-            TwoBalls timer (OutOfGoal (move ball1)) (OutOfGoal (move ball2))
-
-        ThreeBalls (OutOfGoal ball1) (OutOfGoal ball2) (OutOfGoal ball3) ->
-            ThreeBalls (OutOfGoal (move ball1)) (OutOfGoal (move ball2)) (OutOfGoal (move ball3))
-
-        _ ->
-            balls
+    { balls | inGame = Dict.map (\_ ball -> Ball.moveUntil newFrameTime ball) balls.inGame }
 
 
 changeGameBalls : Time.Posix -> Int -> Game -> Game
@@ -496,60 +419,15 @@ since that happens before collisions and movements.
 -}
 prepareBallsMovements : Float -> Balls -> Balls
 prepareBallsMovements duration balls =
-    case balls of
-        NoBall _ ->
-            balls
-
-        OneBall timer (OutOfGoal ball) ->
-            OneBall timer (OutOfGoal (Ball.prepareMovement duration ball))
-
-        TwoBalls timer (OutOfGoal ball1) (OutOfGoal ball2) ->
-            let
-                newBall1 =
-                    Ball.prepareMovement duration ball1
-
-                newBall2 =
-                    Ball.prepareMovement duration ball2
-            in
-            TwoBalls timer (OutOfGoal newBall1) (OutOfGoal newBall2)
-
-        ThreeBalls (OutOfGoal ball1) (OutOfGoal ball2) (OutOfGoal ball3) ->
-            let
-                newBall1 =
-                    Ball.prepareMovement duration ball1
-
-                newBall2 =
-                    Ball.prepareMovement duration ball2
-
-                newBall3 =
-                    Ball.prepareMovement duration ball3
-            in
-            ThreeBalls (OutOfGoal newBall1) (OutOfGoal newBall2) (OutOfGoal newBall3)
-
-        _ ->
-            balls
+    { balls | inGame = Dict.map (\_ ball -> Ball.prepareMovement duration ball) balls.inGame }
 
 
 checkSpawnBall : Time.Posix -> Balls -> Balls
-checkSpawnBall frameTime balls =
-    case balls of
-        NoBall (FreeSince counterStartTime) ->
-            if timeDiff counterStartTime frameTime > ballTimer then
-                OneBall WaitingPreviousToMove (OutOfGoal (Ball.init frameTime))
-
-            else
-                balls
-
-        OneBall (FreeSince counterStartTime) ballState ->
-            if timeDiff counterStartTime frameTime > ballTimer then
-                TwoBalls WaitingPreviousToMove (OutOfGoal (Ball.init frameTime)) ballState
-
-            else
-                balls
-
-        TwoBalls (FreeSince counterStartTime) ballState1 ballState2 ->
-            if timeDiff counterStartTime frameTime > ballTimer then
-                ThreeBalls (OutOfGoal (Ball.init frameTime)) ballState1 ballState2
+checkSpawnBall frameTime ({ inGame, incoming, timer } as balls) =
+    case ( incoming, timer ) of
+        ( ballId :: otherBallIds, FreeSince timerStartTime ) ->
+            if timeDiff timerStartTime frameTime > ballTimer then
+                Balls (Dict.insert ballId (Ball.init frameTime) inGame) otherBallIds WaitingForFreeSpace
 
             else
                 balls
@@ -559,24 +437,18 @@ checkSpawnBall frameTime balls =
 
 
 checkStartBallCounter : Time.Posix -> Balls -> Balls
-checkStartBallCounter frameTime balls =
-    case balls of
-        OneBall WaitingPreviousToMove ((OutOfGoal ball) as ballState) ->
-            if Ball.squareDistanceFrom Field.center ball > Ball.size * Ball.size then
-                OneBall (FreeSince frameTime) ballState
+checkStartBallCounter frameTime ({ inGame, incoming, timer } as balls) =
+    if timer == WaitingForFreeSpace && not (List.isEmpty incoming) && centerIsFree inGame then
+        { balls | timer = FreeSince frameTime }
 
-            else
-                balls
+    else
+        balls
 
-        TwoBalls WaitingPreviousToMove ((OutOfGoal ball) as ballState1) ballState2 ->
-            if Ball.squareDistanceFrom Field.center ball > Ball.size * Ball.size then
-                TwoBalls (FreeSince frameTime) ballState1 ballState2
 
-            else
-                balls
-
-        _ ->
-            balls
+centerIsFree : Dict Int Ball -> Bool
+centerIsFree ballsInGame =
+    Dict.values ballsInGame
+        |> List.all (\ball -> Ball.squareDistanceFrom Field.center ball > Ball.size * Ball.size)
 
 
 ballTimer : Int
@@ -587,30 +459,3 @@ ballTimer =
 timeDiff : Time.Posix -> Time.Posix -> Int
 timeDiff t1 t2 =
     Time.posixToMillis t2 - Time.posixToMillis t1
-
-
-ballsListAcc : Balls -> List Ball -> List Ball
-ballsListAcc balls acc =
-    case balls of
-        OneBall _ (OutOfGoal ball) ->
-            ball :: acc
-
-        TwoBalls _ (OutOfGoal ball1) ballState2 ->
-            ballsListAcc (OneBall noTimer ballState2) (ball1 :: acc)
-
-        TwoBalls _ _ ballState2 ->
-            ballsListAcc (OneBall noTimer ballState2) acc
-
-        ThreeBalls (OutOfGoal ball1) ballState2 ballState3 ->
-            ballsListAcc (TwoBalls noTimer ballState2 ballState3) (ball1 :: acc)
-
-        ThreeBalls _ ballState2 ballState3 ->
-            ballsListAcc (TwoBalls noTimer ballState2 ballState3) acc
-
-        _ ->
-            acc
-
-
-noTimer : BallTimer
-noTimer =
-    WaitingPreviousToMove
