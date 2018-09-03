@@ -113,15 +113,15 @@ update newFrameTime duration playerControls game =
         newDirections =
             { one = Maybe.withDefault game.player1.direction playerControls.one.thrusting
             , two = Maybe.withDefault game.player2.direction playerControls.two.thrusting
-            , three = game.player3.direction
-            , four = game.player4.direction
+            , three = Maybe.withDefault game.player3.direction playerControls.three.thrusting
+            , four = Maybe.withDefault game.player4.direction playerControls.four.thrusting
             }
 
         newThrustings =
             { one = not (isNothing playerControls.one.thrusting)
             , two = not (isNothing playerControls.two.thrusting)
-            , three = game.player3.thrusting
-            , four = game.player4.thrusting
+            , three = not (isNothing playerControls.three.thrusting)
+            , four = not (isNothing playerControls.four.thrusting)
             }
 
         newShotKeys =
