@@ -46,21 +46,16 @@ viewField frameSize game =
                 |> Svg.g []
 
         bullets =
-            Game.allBullets game
-                |> List.map bulletsDictToSvg
+            game.bullets
+                |> Dict.values
+                |> List.map (.bullet >> Views.Svg.Bullet.view)
                 |> Svg.g []
 
         balls =
-            Game.allBalls game
+            game.balls.inGame
+                |> Dict.values
                 |> List.map Views.Svg.Ball.view
                 |> Svg.g []
     in
     Views.Svg.Field.view
         [ Views.Svg.Field.background, balls, bullets, players ]
-
-
-bulletsDictToSvg : Dict Int Bullet -> Svg msg
-bulletsDictToSvg =
-    Dict.values
-        >> List.map Views.Svg.Bullet.view
-        >> Svg.g []

@@ -1,8 +1,6 @@
 module Data.Game exposing
     ( Balls
     , Game
-    , allBalls
-    , allBullets
     , allPlayers
     , init
     , update
@@ -21,17 +19,20 @@ import Time
 type alias Game =
     { startTime : Time.Posix
     , frameTime : Time.Posix
-    , frameId : Int
+    , uniqueId : Int
     , score : ( Int, Int )
     , player1 : Player
     , player2 : Player
     , player3 : Player
     , player4 : Player
-    , bullets1 : Dict Int Bullet
-    , bullets2 : Dict Int Bullet
-    , bullets3 : Dict Int Bullet
-    , bullets4 : Dict Int Bullet
+    , bullets : Dict Int PlayerBullet
     , balls : Balls
+    }
+
+
+type alias PlayerBullet =
+    { playerId : OneOfFour
+    , bullet : Bullet
     }
 
 
@@ -51,16 +52,13 @@ init : Time.Posix -> Game
 init startTime =
     { startTime = startTime
     , frameTime = startTime
-    , frameId = 0
+    , uniqueId = 0
     , score = ( 0, 0 )
     , player1 = Player.init startTime 0 Field.placePlayer1
     , player2 = Player.init startTime 0 Field.placePlayer2
     , player3 = Player.init startTime pi Field.placePlayer3
     , player4 = Player.init startTime pi Field.placePlayer4
-    , bullets1 = Dict.empty
-    , bullets2 = Dict.empty
-    , bullets3 = Dict.empty
-    , bullets4 = Dict.empty
+    , bullets = Dict.empty
     , balls = Balls Dict.empty [ 0, 1, 2 ] (FreeSince startTime)
     }
 
@@ -68,16 +66,6 @@ init startTime =
 allPlayers : Game -> List Player
 allPlayers { player1, player2, player3, player4 } =
     [ player1, player2, player3, player4 ]
-
-
-allBullets : Game -> List (Dict Int Bullet)
-allBullets { bullets1, bullets2, bullets3, bullets4 } =
-    [ bullets1, bullets2, bullets3, bullets4 ]
-
-
-allBalls : Game -> List Ball
-allBalls { balls } =
-    Dict.values balls.inGame
 
 
 update : Time.Posix -> Int -> Four Player.Control -> Game -> Game
@@ -165,17 +153,8 @@ processCollision : { time : Float, kind : Collision.Kind } -> Game -> Game
 processCollision { time, kind } game =
     case kind of
         -- bullet - wall
-        Collision.BulletWall ( Un, id ) _ ->
-            { game | bullets1 = Dict.remove id game.bullets1 }
-
-        Collision.BulletWall ( Deux, id ) _ ->
-            { game | bullets2 = Dict.remove id game.bullets2 }
-
-        Collision.BulletWall ( Trois, id ) _ ->
-            { game | bullets3 = Dict.remove id game.bullets3 }
-
-        Collision.BulletWall ( Quatre, id ) _ ->
-            { game | bullets4 = Dict.remove id game.bullets4 }
+        Collision.BulletWall id _ ->
+            { game | bullets = Dict.remove id game.bullets }
 
         -- bullet - ball
         Collision.BulletBall bulletId ballId ->
@@ -186,52 +165,17 @@ processCollision { time, kind } game =
             game
 
 
-impactIdentifiedBulletOnBall : Float -> ( OneOfFour, Int ) -> Int -> Game -> Game
-impactIdentifiedBulletOnBall time ( oneOfFour, id ) ballId game =
-    case oneOfFour of
-        Un ->
-            case Dict.get id game.bullets1 of
-                Nothing ->
-                    game
+impactIdentifiedBulletOnBall : Float -> Int -> Int -> Game -> Game
+impactIdentifiedBulletOnBall time id ballId game =
+    case Dict.get id game.bullets of
+        Nothing ->
+            game
 
-                Just bullet ->
-                    { game
-                        | bullets1 = Dict.remove id game.bullets1
-                        , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
-                    }
-
-        Deux ->
-            case Dict.get id game.bullets2 of
-                Nothing ->
-                    game
-
-                Just bullet ->
-                    { game
-                        | bullets2 = Dict.remove id game.bullets2
-                        , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
-                    }
-
-        Trois ->
-            case Dict.get id game.bullets3 of
-                Nothing ->
-                    game
-
-                Just bullet ->
-                    { game
-                        | bullets3 = Dict.remove id game.bullets3
-                        , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
-                    }
-
-        Quatre ->
-            case Dict.get id game.bullets4 of
-                Nothing ->
-                    game
-
-                Just bullet ->
-                    { game
-                        | bullets4 = Dict.remove id game.bullets4
-                        , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
-                    }
+        Just { bullet } ->
+            { game
+                | bullets = Dict.remove id game.bullets
+                , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
+            }
 
 
 updateBallWithId : (Ball -> Ball) -> Int -> Balls -> Balls
@@ -264,10 +208,8 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
             Time.posixToMillis endTime - Time.posixToMillis game.frameTime
 
         allBulletsList =
-            Dict.values (Dict.map (triple Un) game.bullets1)
-                |> reversePrepend (Dict.values (Dict.map (triple Deux) game.bullets2))
-                |> reversePrepend (Dict.values (Dict.map (triple Trois) game.bullets3))
-                |> reversePrepend (Dict.values (Dict.map (triple Quatre) game.bullets4))
+            Dict.toList game.bullets
+                |> List.map (Tuple.mapSecond .bullet)
 
         allBallsWithId =
             Dict.toList game.balls.inGame
@@ -326,20 +268,8 @@ moveAllUntil newFrameTime game =
         duration =
             Time.posixToMillis newFrameTime - Time.posixToMillis game.frameTime
 
-        moveBullet _ =
-            Bullet.move duration
-
-        newBullets1 =
-            Dict.map moveBullet game.bullets1
-
-        newBullets2 =
-            Dict.map moveBullet game.bullets2
-
-        newBullets3 =
-            Dict.map moveBullet game.bullets3
-
-        newBullets4 =
-            Dict.map moveBullet game.bullets4
+        newBullets =
+            Dict.map (\_ pB -> { pB | bullet = Bullet.move duration pB.bullet }) game.bullets
 
         newBalls =
             moveBallsUntil newFrameTime game.balls
@@ -350,10 +280,7 @@ moveAllUntil newFrameTime game =
         , player2 = newPlayer2
         , player3 = newPlayer3
         , player4 = newPlayer4
-        , bullets1 = newBullets1
-        , bullets2 = newBullets2
-        , bullets3 = newBullets3
-        , bullets4 = newBullets4
+        , bullets = newBullets
         , balls = newBalls
     }
 
@@ -362,7 +289,7 @@ moveAllUntil newFrameTime game =
 -- SPAWN BULLETS #####################################################
 
 
-{-| Spawn bullets and increment frameId.
+{-| Spawn bullets.
 -}
 spawnAllBullets : Four Bool -> Game -> Game
 spawnAllBullets shotKeys game =
@@ -378,40 +305,36 @@ spawnAllBullets shotKeys game =
 
         ( newPlayer4, hasShot4 ) =
             Player.updateShot shotKeys.four game.player4
-
-        newBullets1 =
-            updateBullets game.frameId hasShot1 game.player1 game.bullets1
-
-        newBullets2 =
-            updateBullets game.frameId hasShot2 game.player2 game.bullets2
-
-        newBullets3 =
-            updateBullets game.frameId hasShot3 game.player3 game.bullets3
-
-        newBullets4 =
-            updateBullets game.frameId hasShot4 game.player4 game.bullets4
     in
     { game
         | player1 = newPlayer1
         , player2 = newPlayer2
         , player3 = newPlayer3
         , player4 = newPlayer4
-        , bullets1 = newBullets1
-        , bullets2 = newBullets2
-        , bullets3 = newBullets3
-        , bullets4 = newBullets4
-        , frameId = game.frameId + 1
     }
+        |> updateBullets Un hasShot1 newPlayer1
+        |> updateBullets Deux hasShot2 newPlayer2
+        |> updateBullets Trois hasShot3 newPlayer3
+        |> updateBullets Quatre hasShot4 newPlayer4
 
 
-updateBullets : Int -> Player.HasShot -> Player -> Dict Int Bullet -> Dict Int Bullet
-updateBullets frameId hasShot player bullets =
+updateBullets : OneOfFour -> Player.HasShot -> Player -> Game -> Game
+updateBullets oneOfFour hasShot player game =
     case hasShot of
         Player.NoShot ->
-            bullets
+            game
 
         Player.ShotAfter chargeTime ->
-            Dict.insert frameId (spawnPlayerBullet chargeTime player) bullets
+            let
+                playerBullet =
+                    { playerId = oneOfFour
+                    , bullet = spawnPlayerBullet chargeTime player
+                    }
+            in
+            { game
+                | uniqueId = game.uniqueId + 1
+                , bullets = Dict.insert game.uniqueId playerBullet game.bullets
+            }
 
 
 spawnPlayerBullet : Int -> Player -> Bullet
