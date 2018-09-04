@@ -200,9 +200,38 @@ impactIdentifiedBulletOnBall time ( oneOfFour, id ) ballId game =
                         , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
                     }
 
-        -- TODO treat cases with bullets of players 2, 3 and 4
-        _ ->
-            game
+        Deux ->
+            case Dict.get id game.bullets2 of
+                Nothing ->
+                    game
+
+                Just bullet ->
+                    { game
+                        | bullets2 = Dict.remove id game.bullets2
+                        , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
+                    }
+
+        Trois ->
+            case Dict.get id game.bullets3 of
+                Nothing ->
+                    game
+
+                Just bullet ->
+                    { game
+                        | bullets3 = Dict.remove id game.bullets3
+                        , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
+                    }
+
+        Quatre ->
+            case Dict.get id game.bullets4 of
+                Nothing ->
+                    game
+
+                Just bullet ->
+                    { game
+                        | bullets4 = Dict.remove id game.bullets4
+                        , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
+                    }
 
 
 updateBallWithId : (Ball -> Ball) -> Int -> Balls -> Balls
@@ -448,7 +477,7 @@ checkStartBallCounter frameTime ({ inGame, incoming, timer } as balls) =
 centerIsFree : Dict Int Ball -> Bool
 centerIsFree ballsInGame =
     Dict.values ballsInGame
-        |> List.all (\ball -> Ball.squareDistanceFrom Field.center ball > Ball.size * Ball.size)
+        |> List.all (\ball -> Ball.squareDistanceFrom Field.center ball > 4 * Ball.size * Ball.size)
 
 
 ballTimer : Int
