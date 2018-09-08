@@ -4,10 +4,12 @@ module Physical.Player exposing
     , Player
     , checkWallObstacle
     , init
+    , moveDuring
     , moveUntil
     , prepareMovement
     , shotRecoil
     , size
+    , stun
     , updateShot
     )
 
@@ -52,6 +54,11 @@ init frameTime direction pos =
     , shootPrep = Nothing
     , timeState = frameTime
     }
+
+
+stun : Player -> Player
+stun player =
+    { player | stunned = Just player.timeState }
 
 
 {-| Update thrusting, direction, speed and stunned such that
@@ -108,6 +115,16 @@ prepareMovement duration thrusting direction player =
         , speed = speed
         , stunned = stunned
     }
+
+
+moveDuring : Float -> Player -> Player
+moveDuring duration player =
+    let
+        time =
+            (Time.posixToMillis player.timeState + floor duration)
+                |> Time.millisToPosix
+    in
+    moveUntil time player
 
 
 moveUntil : Time.Posix -> Player -> Player

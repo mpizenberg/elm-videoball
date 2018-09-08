@@ -161,8 +161,60 @@ processCollision { time, kind } game =
             -- TODO later: if medium size bullet, do not destroy?
             impactIdentifiedBulletOnBall time bulletId ballId game
 
+        -- player - bullet
+        Collision.PlayerBullet oneOfFour bulletId ->
+            impactIdentifiedBulletOnPlayer time bulletId oneOfFour game
+
         _ ->
             game
+
+
+impactIdentifiedBulletOnPlayer : Float -> Int -> OneOfFour -> Game -> Game
+impactIdentifiedBulletOnPlayer time bulletId oneOfFour game =
+    case ( Dict.get bulletId game.bullets, oneOfFour ) of
+        ( Just { bullet }, Un ) ->
+            { game
+                | player1 = impactBulletOnPlayer time bullet game.player1
+                , bullets = Dict.remove bulletId game.bullets
+            }
+
+        ( Just { bullet }, Deux ) ->
+            { game
+                | player2 = impactBulletOnPlayer time bullet game.player2
+                , bullets = Dict.remove bulletId game.bullets
+            }
+
+        ( Just { bullet }, Trois ) ->
+            { game
+                | player3 = impactBulletOnPlayer time bullet game.player3
+                , bullets = Dict.remove bulletId game.bullets
+            }
+
+        ( Just { bullet }, Quatre ) ->
+            { game
+                | player4 = impactBulletOnPlayer time bullet game.player4
+                , bullets = Dict.remove bulletId game.bullets
+            }
+
+        _ ->
+            game
+
+
+impactBulletOnPlayer : Float -> Bullet -> Player -> Player
+impactBulletOnPlayer time bullet player =
+    let
+        movedPlayer =
+            Player.moveDuring time player
+
+        ( speedX, speedY ) =
+            player.speed
+
+        newSpeed =
+            ( speedX + 0.5 * cos bullet.direction
+            , speedY + 0.5 * sin bullet.direction
+            )
+    in
+    Player.stun { movedPlayer | speed = newSpeed }
 
 
 impactIdentifiedBulletOnBall : Float -> Int -> Int -> Game -> Game
@@ -216,7 +268,7 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
     in
     Collision.playerPlayerAll duration player1 player2 player3 player4
         -- |> reversePrepend (Collision.playerWallAll duration player1 player2 player3 player4)
-        -- |> reversePrepend (Collision.playerBulletAll duration player1 player2 player3 player4 allBulletsList)
+        |> reversePrepend (Collision.playerBulletAll duration player1 player2 player3 player4 allBulletsList)
         -- |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBallsWithId)
         -- |> reversePrepend (Collision.bulletBulletAll duration allBulletsList)
         |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBallsWithId)

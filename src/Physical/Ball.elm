@@ -64,7 +64,7 @@ moveDuring : Float -> Ball -> Ball
 moveDuring duration ball =
     let
         time =
-            (Time.posixToMillis ball.timeState + round duration)
+            (Time.posixToMillis ball.timeState + floor duration)
                 |> Time.millisToPosix
     in
     moveUntil time ball

@@ -2,6 +2,7 @@ module Processing.Collision exposing
     ( Kind(..)
     , bulletBallAll
     , bulletWallAll
+    , playerBulletAll
     , playerPlayerAll
     )
 
@@ -53,8 +54,68 @@ playerWallAll duration p1 p2 p3 p4 =
 
 playerBulletAll : Int -> Player -> Player -> Player -> Player -> List ( Int, Bullet ) -> List { time : Float, kind : Kind }
 playerBulletAll duration p1 p2 p3 p4 bullets =
-    -- Debug.todo "playerBulletAll"
-    []
+    collidePlayerWithAllBullets duration ( Un, p1 ) bullets
+        |> reversePrepend (collidePlayerWithAllBullets duration ( Deux, p2 ) bullets)
+        |> reversePrepend (collidePlayerWithAllBullets duration ( Trois, p3 ) bullets)
+        |> reversePrepend (collidePlayerWithAllBullets duration ( Quatre, p4 ) bullets)
+
+
+collidePlayerWithAllBullets : Int -> ( OneOfFour, Player ) -> List ( Int, Bullet ) -> List { time : Float, kind : Kind }
+collidePlayerWithAllBullets duration identifiedPlayer bullets =
+    List.filterMap (collidePlayerWithBullet duration identifiedPlayer) bullets
+
+
+collidePlayerWithBullet : Int -> ( OneOfFour, Player ) -> ( Int, Bullet ) -> Maybe { time : Float, kind : Kind }
+collidePlayerWithBullet duration ( oneOfFour, player ) ( bulletId, bullet ) =
+    let
+        ( bulletRadius, bulletSpeedX, bulletSpeedY ) =
+            Bullet.radiusAndSpeed bullet
+
+        a =
+            fromTo player.speed ( bulletSpeedX, bulletSpeedY )
+
+        b =
+            fromTo player.pos bullet.pos
+
+        d =
+            Player.size + bulletRadius
+
+        -- for t in [0,duration], solve | a * t + b | <= d
+        aa =
+            norm2 a
+
+        bb =
+            norm2 b
+
+        ab =
+            dot a b
+
+        dd =
+            d * d
+
+        discriminant =
+            ab * ab - aa * (bb - dd)
+    in
+    if discriminant < 0 then
+        Nothing
+
+    else
+        let
+            sqDiscriminant =
+                sqrt discriminant
+
+            t1 =
+                (-ab - sqDiscriminant) / aa
+
+            t2 =
+                (-ab + sqDiscriminant) / aa
+        in
+        -- check that [t1,t2] intersects [0,duration]
+        if t2 >= 0 && t1 <= toFloat duration then
+            Just { time = max 0 t1, kind = PlayerBullet oneOfFour bulletId }
+
+        else
+            Nothing
 
 
 
@@ -84,7 +145,7 @@ bulletBulletAll duration bullets =
 bulletWallAll : Int -> List ( Int, Bullet ) -> List { time : Float, kind : Kind }
 bulletWallAll duration bullets =
     List.map (collideWithWalls duration) bullets
-        |> List.foldl reverseAppend []
+        |> List.foldl reversePrepend []
 
 
 collideWithWalls : Int -> ( Int, Bullet ) -> List { time : Float, kind : Kind }
@@ -123,7 +184,7 @@ collideWithWalls duration ( id, bullet ) =
 bulletBallAll : Int -> List ( Int, Bullet ) -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
 bulletBallAll duration bullets balls =
     List.map (collideBallWithBullets duration bullets) balls
-        |> List.foldl reverseAppend []
+        |> List.foldl reversePrepend []
 
 
 collideBallWithBullets : Int -> List ( Int, Bullet ) -> ( Int, Ball ) -> List { time : Float, kind : Kind }
@@ -288,14 +349,14 @@ timeOfCollideWithBottomWall radius y vY =
         distance / vY
 
 
-reverseAppend : List a -> List a -> List a
-reverseAppend list1 list2 =
+reversePrepend : List a -> List a -> List a
+reversePrepend list1 list2 =
     case list1 of
         [] ->
             list2
 
         l :: ls ->
-            reverseAppend ls (l :: list2)
+            reversePrepend ls (l :: list2)
 
 
 
