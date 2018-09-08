@@ -6,6 +6,7 @@ module Physical.Player exposing
     , init
     , moveUntil
     , prepareMovement
+    , shotRecoil
     , size
     , updateShot
     )
@@ -197,3 +198,17 @@ updateShot spaceBarDown player =
 
         _ ->
             ( player, NoShot )
+
+
+shotRecoil : Player -> Player
+shotRecoil player =
+    let
+        ( vX, vY ) =
+            player.speed
+
+        newSpeed =
+            ( vX - 0.5 * cos player.direction
+            , vY - 0.5 * sin player.direction
+            )
+    in
+    { player | speed = newSpeed }

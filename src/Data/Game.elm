@@ -326,15 +326,32 @@ updateBullets oneOfFour hasShot player game =
 
         Player.ShotAfter chargeTime ->
             let
+                newPlayer =
+                    Player.shotRecoil player
+
                 playerBullet =
                     { playerId = oneOfFour
                     , bullet = spawnPlayerBullet chargeTime player
                     }
+
+                newBullets =
+                    Dict.insert game.uniqueId playerBullet game.bullets
+
+                newId =
+                    game.uniqueId + 1
             in
-            { game
-                | uniqueId = game.uniqueId + 1
-                , bullets = Dict.insert game.uniqueId playerBullet game.bullets
-            }
+            case oneOfFour of
+                Un ->
+                    { game | player1 = newPlayer, uniqueId = newId, bullets = newBullets }
+
+                Deux ->
+                    { game | player2 = newPlayer, uniqueId = newId, bullets = newBullets }
+
+                Trois ->
+                    { game | player3 = newPlayer, uniqueId = newId, bullets = newBullets }
+
+                Quatre ->
+                    { game | player4 = newPlayer, uniqueId = newId, bullets = newBullets }
 
 
 spawnPlayerBullet : Int -> Player -> Bullet
