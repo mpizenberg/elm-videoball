@@ -355,8 +355,24 @@ updateBullets oneOfFour hasShot player game =
 
 
 spawnPlayerBullet : Int -> Player -> Bullet
-spawnPlayerBullet _ player =
-    Bullet.new Bullet.Small player.direction player.pos
+spawnPlayerBullet duration player =
+    let
+        bulletSize =
+            Bullet.Small
+
+        creationDistance =
+            -- add 1.0 to make sure player and bullets don't collide immediately
+            1.0 + Player.size + Bullet.smallSize
+
+        ( x, y ) =
+            player.pos
+
+        bulletPos =
+            ( x + creationDistance * cos player.direction
+            , y + creationDistance * sin player.direction
+            )
+    in
+    Bullet.new bulletSize player.direction bulletPos
 
 
 

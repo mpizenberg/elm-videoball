@@ -238,22 +238,54 @@ makeCollisionIfLowerThan duration kind collisionTime =
 
 timeOfCollideWithLeftWall : Float -> Float -> Float -> Float
 timeOfCollideWithLeftWall radius x vX =
-    (radius - x) / vX
+    let
+        negativeDistance =
+            radius - x
+    in
+    if negativeDistance > 0 then
+        0
+
+    else
+        negativeDistance / vX
 
 
 timeOfCollideWithRightWall : Float -> Float -> Float -> Float
 timeOfCollideWithRightWall radius x vX =
-    (Field.width - radius - x) / vX
+    let
+        distance =
+            Field.width - radius - x
+    in
+    if distance < 0 then
+        0
+
+    else
+        distance / vX
 
 
 timeOfCollideWithTopWall : Float -> Float -> Float -> Float
 timeOfCollideWithTopWall radius y vY =
-    (radius - y) / vY
+    let
+        negativeDistance =
+            radius - y
+    in
+    if negativeDistance > 0 then
+        0
+
+    else
+        negativeDistance / vY
 
 
 timeOfCollideWithBottomWall : Float -> Float -> Float -> Float
 timeOfCollideWithBottomWall radius y vY =
-    (Field.height - radius - y) / vY
+    let
+        distance =
+            Field.height - radius - y
+    in
+    if distance < 0 then
+        0
+
+    else
+        distance / vY
 
 
 reverseAppend : List a -> List a -> List a
