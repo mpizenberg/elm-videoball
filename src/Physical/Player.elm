@@ -31,12 +31,12 @@ maxSpeed =
 
 mediumChargeTime : Int
 mediumChargeTime =
-    100
+    1000
 
 
 bigChargeTime : Int
 bigChargeTime =
-    200
+    2000
 
 
 type alias Player =

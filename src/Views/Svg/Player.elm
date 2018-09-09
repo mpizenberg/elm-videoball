@@ -3,10 +3,11 @@ module Views.Svg.Player exposing (view)
 import Physical.Player as Player exposing (Player, size)
 import Svg exposing (Svg)
 import Svg.Attributes
+import Time
 
 
 view : Player -> Svg msg
-view { pos, direction, shootPrep, stunned } =
+view { pos, direction, shootPrep, stunned, timeState } =
     let
         dirB =
             direction + 2 * pi / 3
@@ -68,16 +69,23 @@ view { pos, direction, shootPrep, stunned } =
                 []
 
         -- shoot
-        shootOpacity =
+        ( shootOpacity, prepDuration ) =
             case shootPrep of
                 Nothing ->
-                    "0"
+                    ( "0", 0 )
 
-                Just _ ->
-                    "0.5"
+                Just prepTime ->
+                    ( "0.5", Time.posixToMillis timeState - Time.posixToMillis prepTime )
 
         shootDiskSize =
-            "20"
+            if prepDuration > Player.bigChargeTime then
+                "40"
+
+            else if prepDuration > Player.mediumChargeTime then
+                "30"
+
+            else
+                "20"
 
         shootDisk =
             Svg.circle
