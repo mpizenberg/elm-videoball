@@ -329,7 +329,12 @@ impactBulletOnPlayer time bullet player =
             , speedY + 0.5 * sin bullet.direction
             )
     in
-    Player.stun { movedPlayer | speed = newSpeed }
+    case player.stunned of
+        Nothing ->
+            Player.stun { movedPlayer | speed = newSpeed }
+
+        _ ->
+            { movedPlayer | speed = newSpeed }
 
 
 impactIdentifiedBulletOnBall : Float -> Int -> Int -> Game -> Game
