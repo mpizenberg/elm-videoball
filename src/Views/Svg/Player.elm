@@ -48,6 +48,7 @@ view { pos, direction, shootPrep, stunned } =
         player =
             Svg.polygon [ Svg.Attributes.points points ] []
 
+        -- stunn
         stunOpacity =
             case stunned of
                 Nothing ->
@@ -65,5 +66,27 @@ view { pos, direction, shootPrep, stunned } =
                 , Svg.Attributes.opacity stunOpacity
                 ]
                 []
+
+        -- shoot
+        shootOpacity =
+            case shootPrep of
+                Nothing ->
+                    "0"
+
+                Just _ ->
+                    "0.5"
+
+        shootDiskSize =
+            "20"
+
+        shootDisk =
+            Svg.circle
+                [ Svg.Attributes.cx (String.fromFloat xA)
+                , Svg.Attributes.cy (String.fromFloat yA)
+                , Svg.Attributes.r shootDiskSize
+                , Svg.Attributes.fill "white"
+                , Svg.Attributes.opacity shootOpacity
+                ]
+                []
     in
-    Svg.g [] [ stunDisk, player ]
+    Svg.g [] [ stunDisk, player, shootDisk ]
