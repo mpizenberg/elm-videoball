@@ -529,12 +529,19 @@ updateBullets oneOfFour hasShot player game =
 spawnPlayerBullet : Int -> Player -> Bullet
 spawnPlayerBullet duration player =
     let
-        bulletSize =
-            Bullet.Small
+        ( bulletSize, bulletSizeFloat ) =
+            if duration > Player.bigChargeTime then
+                ( Bullet.Big, Bullet.bigSize )
+
+            else if duration > Player.mediumChargeTime then
+                ( Bullet.Medium, Bullet.mediumSize )
+
+            else
+                ( Bullet.Small, Bullet.smallSize )
 
         creationDistance =
             -- add 1.0 to make sure player and bullets don't collide immediately
-            1.0 + Player.size + Bullet.smallSize
+            1.0 + Player.size + bulletSizeFloat
 
         ( x, y ) =
             player.pos

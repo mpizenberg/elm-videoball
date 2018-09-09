@@ -2,8 +2,10 @@ module Physical.Player exposing
     ( Control
     , HasShot(..)
     , Player
+    , bigChargeTime
     , checkWallObstacle
     , init
+    , mediumChargeTime
     , moveDuring
     , moveUntil
     , prepareMovement
@@ -25,6 +27,16 @@ size =
 maxSpeed : Float
 maxSpeed =
     1.0
+
+
+mediumChargeTime : Int
+mediumChargeTime =
+    100
+
+
+bigChargeTime : Int
+bigChargeTime =
+    200
 
 
 type alias Player =
