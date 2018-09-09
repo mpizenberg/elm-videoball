@@ -323,9 +323,20 @@ impactBulletOnPlayer time bullet player =
         ( speedX, speedY ) =
             player.speed
 
+        impactForce =
+            case bullet.size of
+                Bullet.Small ->
+                    0.5
+
+                Bullet.Medium ->
+                    1.0
+
+                Bullet.Big ->
+                    2.0
+
         newSpeed =
-            ( speedX + 0.5 * cos bullet.direction
-            , speedY + 0.5 * sin bullet.direction
+            ( speedX + impactForce * cos bullet.direction
+            , speedY + impactForce * sin bullet.direction
             )
     in
     case player.stunned of
