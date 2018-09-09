@@ -159,7 +159,6 @@ processCollision { time, kind } game =
 
         -- bullet - ball
         Collision.BulletBall bulletId ballId ->
-            -- TODO later: if medium size bullet, do not destroy?
             impactIdentifiedBulletOnBall time bulletId ballId game
 
         -- player - bullet
@@ -345,6 +344,7 @@ impactIdentifiedBulletOnBall time id ballId game =
 
         Just { bullet } ->
             { game
+              -- TODO later: if medium size bullet, do not destroy?
                 | bullets = Dict.remove id game.bullets
                 , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
             }
@@ -365,9 +365,21 @@ impactBulletOnBall time bullet ball =
         ( speedX, speedY ) =
             movedBall.speed
 
+        impactForce =
+            case bullet.size of
+                Bullet.Small ->
+                    0.5
+
+                Bullet.Medium ->
+                    1.0
+
+                Bullet.Big ->
+                    2.0
+
+        -- TODO later: if big, put ball in superspeed mode
         newSpeed =
-            ( speedX + 0.5 * cos bullet.direction
-            , speedY + 0.5 * sin bullet.direction
+            ( speedX + impactForce * cos bullet.direction
+            , speedY + impactForce * sin bullet.direction
             )
     in
     { movedBall | speed = newSpeed }
