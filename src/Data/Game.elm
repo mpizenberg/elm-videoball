@@ -174,8 +174,17 @@ processCollision { time, kind } game =
         Collision.BallWall ballId wall ->
             impactBallWall time ballId wall game
 
+        -- bullet - bullet
+        Collision.BulletBullet id1 id2 ->
+            impactBulletBullet id1 id2 game
+
         _ ->
             game
+
+
+impactBulletBullet : Int -> Int -> Game -> Game
+impactBulletBullet id1 id2 ({ bullets } as game) =
+    { game | bullets = Dict.remove id1 bullets |> Dict.remove id2 }
 
 
 impactBallWall : Float -> Int -> Field.Wall -> Game -> Game
@@ -413,7 +422,7 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
         -- |> reversePrepend (Collision.playerWallAll duration player1 player2 player3 player4)
         |> reversePrepend (Collision.playerBulletAll duration player1 player2 player3 player4 allBulletsList)
         -- |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBallsWithId)
-        -- |> reversePrepend (Collision.bulletBulletAll duration allBulletsList)
+        |> reversePrepend (Collision.bulletBulletAll duration allBulletsList)
         |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBallsWithId)
         |> reversePrepend (Collision.ballBallAll duration allBallsWithId)
         |> reversePrepend (Collision.ballWallAll duration allBallsWithId)

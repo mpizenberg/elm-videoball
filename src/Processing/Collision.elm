@@ -3,11 +3,13 @@ module Processing.Collision exposing
     , ballBallAll
     , ballWallAll
     , bulletBallAll
+    , bulletBulletAll
     , bulletWallAll
     , playerBulletAll
     , playerPlayerAll
     )
 
+import Data.Combination exposing (pairs)
 import Data.Helper exposing (OneOfFour(..))
 import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
@@ -137,7 +139,8 @@ playerBallAll duration p1 p2 p3 p4 balls =
 bulletBulletAll : Int -> List ( Int, Bullet ) -> List { time : Float, kind : Kind }
 bulletBulletAll duration bullets =
     -- Debug.todo "bulletBulletAll"
-    []
+    pairs bullets
+        |> List.filterMap (\( b1, b2 ) -> collideBulletWithBullet duration b1 b2)
 
 
 
@@ -354,6 +357,62 @@ collideBallWithWalls duration ( id, ball ) =
     in
     [ leftTime, rightTime, topTime, bottomTime ]
         |> List.filterMap identity
+
+
+collideBulletWithBullet : Int -> ( Int, Bullet ) -> ( Int, Bullet ) -> Maybe { time : Float, kind : Kind }
+collideBulletWithBullet duration ( id1, bullet1 ) ( id2, bullet2 ) =
+    let
+        ( radius1, speedX1, speedY1 ) =
+            Bullet.radiusAndSpeed bullet1
+
+        ( radius2, speedX2, speedY2 ) =
+            Bullet.radiusAndSpeed bullet2
+
+        a =
+            fromTo ( speedX1, speedX2 ) ( speedX2, speedY2 )
+
+        b =
+            fromTo bullet1.pos bullet2.pos
+
+        d =
+            radius1 + radius2
+
+        -- for t in [0,duration], solve | a * t + b | <= d
+        aa =
+            norm2 a
+
+        bb =
+            norm2 b
+
+        ab =
+            dot a b
+
+        dd =
+            d * d
+
+        discriminant =
+            ab * ab - aa * (bb - dd)
+    in
+    if discriminant < 0 then
+        Nothing
+
+    else
+        let
+            sqDiscriminant =
+                sqrt discriminant
+
+            t1 =
+                (-ab - sqDiscriminant) / aa
+
+            t2 =
+                (-ab + sqDiscriminant) / aa
+        in
+        -- check that [t1,t2] intersects [0,duration]
+        if t2 >= 0 && t1 <= toFloat duration then
+            Just { time = max 0 t1, kind = BulletBullet id1 id2 }
+
+        else
+            Nothing
 
 
 
