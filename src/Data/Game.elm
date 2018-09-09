@@ -522,7 +522,7 @@ updateBullets oneOfFour hasShot player game =
         Player.ShotAfter chargeTime ->
             let
                 newPlayer =
-                    Player.shotRecoil player
+                    Player.shotRecoil chargeTime player
 
                 playerBullet =
                     { playerId = oneOfFour

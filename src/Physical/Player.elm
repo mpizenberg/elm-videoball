@@ -234,15 +234,25 @@ updateShot spaceBarDown player =
             ( player, NoShot )
 
 
-shotRecoil : Player -> Player
-shotRecoil player =
+shotRecoil : Int -> Player -> Player
+shotRecoil chargeDuration player =
     let
         ( vX, vY ) =
             player.speed
 
+        recoilForce =
+            if chargeDuration > bigChargeTime then
+                1.2
+
+            else if chargeDuration > mediumChargeTime then
+                0.8
+
+            else
+                0.4
+
         newSpeed =
-            ( vX - 0.5 * cos player.direction
-            , vY - 0.5 * sin player.direction
+            ( vX - recoilForce * cos player.direction
+            , vY - recoilForce * sin player.direction
             )
     in
     { player | speed = newSpeed }
