@@ -86,7 +86,7 @@ prepareMovement duration thrusting direction player =
         stillStunned =
             case player.stunned of
                 Just stunnedTime ->
-                    Time.posixToMillis player.timeState - Time.posixToMillis stunnedTime > 2000
+                    Time.posixToMillis player.timeState - Time.posixToMillis stunnedTime < 2000
 
                 Nothing ->
                     False

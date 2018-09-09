@@ -6,7 +6,7 @@ import Svg.Attributes
 
 
 view : Player -> Svg msg
-view { pos, direction, shootPrep } =
+view { pos, direction, shootPrep, stunned } =
     let
         dirB =
             direction + 2 * pi / 3
@@ -44,5 +44,26 @@ view { pos, direction, shootPrep } =
                 , ","
                 , String.fromFloat yC
                 ]
+
+        player =
+            Svg.polygon [ Svg.Attributes.points points ] []
+
+        stunOpacity =
+            case stunned of
+                Nothing ->
+                    "0"
+
+                Just _ ->
+                    "0.5"
+
+        stunDisk =
+            Svg.circle
+                [ Svg.Attributes.cx (String.fromFloat x)
+                , Svg.Attributes.cy (String.fromFloat y)
+                , Svg.Attributes.r (String.fromFloat size)
+                , Svg.Attributes.fill "gray"
+                , Svg.Attributes.opacity stunOpacity
+                ]
+                []
     in
-    Svg.polygon [ Svg.Attributes.points points ] []
+    Svg.g [] [ stunDisk, player ]
