@@ -32,7 +32,7 @@ viewScore ( score1, score2 ) startTime frameTime =
                 , " --- "
                 , String.fromInt durationInSeconds
                 , " --- "
-                , String.fromInt score1
+                , String.fromInt score2
                 ]
         ]
 

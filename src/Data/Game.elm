@@ -171,6 +171,69 @@ processCollision { time, kind } game =
         Collision.BallBall id1 id2 ->
             impactBallBall time id1 id2 game
 
+        -- ball - wall
+        Collision.BallWall ballId wall ->
+            impactBallWall time ballId wall game
+
+        _ ->
+            game
+
+
+impactBallWall : Float -> Int -> Field.Wall -> Game -> Game
+impactBallWall time ballId wall ({ balls } as game) =
+    case ( Dict.get ballId balls.inGame, wall ) of
+        ( Just ball, Field.Top ) ->
+            let
+                movedBall =
+                    Ball.moveDuring time ball
+
+                ( vX, vY ) =
+                    movedBall.speed
+
+                newBall =
+                    { movedBall | speed = ( vX, max -vY vY ) }
+
+                ballsInGame =
+                    Dict.insert ballId newBall balls.inGame
+            in
+            { game | balls = { balls | inGame = ballsInGame } }
+
+        ( Just ball, Field.Bottom ) ->
+            let
+                movedBall =
+                    Ball.moveDuring time ball
+
+                ( vX, vY ) =
+                    movedBall.speed
+
+                newBall =
+                    { movedBall | speed = ( vX, min -vY vY ) }
+
+                ballsInGame =
+                    Dict.insert ballId newBall balls.inGame
+            in
+            { game | balls = { balls | inGame = ballsInGame } }
+
+        ( Just ball, Field.Left ) ->
+            let
+                newBalls =
+                    { balls
+                        | inGame = Dict.remove ballId balls.inGame
+                        , incoming = ballId :: balls.incoming
+                    }
+            in
+            { game | balls = newBalls, score = Tuple.mapSecond ((+) 1) game.score }
+
+        ( Just ball, Field.Right ) ->
+            let
+                newBalls =
+                    { balls
+                        | inGame = Dict.remove ballId balls.inGame
+                        , incoming = ballId :: balls.incoming
+                    }
+            in
+            { game | balls = newBalls, score = Tuple.mapFirst ((+) 1) game.score }
+
         _ ->
             game
 
@@ -325,7 +388,7 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
         -- |> reversePrepend (Collision.bulletBulletAll duration allBulletsList)
         |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBallsWithId)
         |> reversePrepend (Collision.ballBallAll duration allBallsWithId)
-        -- |> reversePrepend (Collision.ballWallAll duration allBallsWithId)
+        |> reversePrepend (Collision.ballWallAll duration allBallsWithId)
         |> reversePrepend (Collision.bulletWallAll duration allBulletsList)
 
 

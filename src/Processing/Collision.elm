@@ -1,6 +1,7 @@
 module Processing.Collision exposing
     ( Kind(..)
     , ballBallAll
+    , ballWallAll
     , bulletBallAll
     , bulletWallAll
     , playerBulletAll
@@ -322,8 +323,37 @@ collideBallWithBall duration ( id1, ball1 ) ( id2, ball2 ) =
 
 ballWallAll : Int -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
 ballWallAll duration balls =
-    -- Debug.todo "ballWallAll"
-    []
+    List.map (collideBallWithWalls duration) balls
+        |> List.foldl reversePrepend []
+
+
+collideBallWithWalls : Int -> ( Int, Ball ) -> List { time : Float, kind : Kind }
+collideBallWithWalls duration ( id, ball ) =
+    let
+        ( x, y ) =
+            ball.pos
+
+        ( vX, vY ) =
+            ball.speed
+
+        leftTime =
+            timeOfCollideWithLeftWall Ball.size x vX
+                |> makeCollisionIfLowerThan duration (BallWall id Field.Left)
+
+        rightTime =
+            timeOfCollideWithRightWall Ball.size x vX
+                |> makeCollisionIfLowerThan duration (BallWall id Field.Right)
+
+        topTime =
+            timeOfCollideWithTopWall Ball.size y vY
+                |> makeCollisionIfLowerThan duration (BallWall id Field.Top)
+
+        bottomTime =
+            timeOfCollideWithBottomWall Ball.size y vY
+                |> makeCollisionIfLowerThan duration (BallWall id Field.Bottom)
+    in
+    [ leftTime, rightTime, topTime, bottomTime ]
+        |> List.filterMap identity
 
 
 
