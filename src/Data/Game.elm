@@ -7,6 +7,7 @@ module Data.Game exposing
     )
 
 import Data.Helper exposing (Four, OneOfFour(..))
+import Data.Vector as Vector
 import Dict exposing (Dict)
 import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
@@ -165,6 +166,57 @@ processCollision { time, kind } game =
         Collision.PlayerBullet oneOfFour bulletId ->
             impactIdentifiedBulletOnPlayer time bulletId oneOfFour game
 
+        -- ball - ball
+        -- https://en.m.wikipedia.org/wiki/Elastic_collision
+        Collision.BallBall id1 id2 ->
+            impactBallBall time id1 id2 game
+
+        _ ->
+            game
+
+
+impactBallBall : Float -> Int -> Int -> Game -> Game
+impactBallBall time id1 id2 ({ balls } as game) =
+    case ( Dict.get id1 balls.inGame, Dict.get id2 balls.inGame ) of
+        ( Just ball1, Just ball2 ) ->
+            let
+                b1 =
+                    Ball.moveDuring time ball1
+
+                b2 =
+                    Ball.moveDuring time ball2
+
+                speedDiff =
+                    Vector.diff b1.speed b2.speed
+
+                centerDiff =
+                    Vector.diff b1.pos b2.pos
+
+                squareDistance =
+                    0.000001 + Vector.norm2 centerDiff
+
+                newSpeed1 =
+                    centerDiff
+                        |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                        |> Vector.diff b1.speed
+
+                newSpeed2 =
+                    centerDiff
+                        |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                        |> Vector.add b2.speed
+
+                newBall1 =
+                    { b1 | speed = newSpeed1 }
+
+                newBall2 =
+                    { b2 | speed = newSpeed2 }
+
+                ballsInGame =
+                    Dict.insert id1 newBall1 balls.inGame
+                        |> Dict.insert id2 newBall2
+            in
+            { game | balls = { balls | inGame = ballsInGame } }
+
         _ ->
             game
 
@@ -272,7 +324,7 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
         -- |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBallsWithId)
         -- |> reversePrepend (Collision.bulletBulletAll duration allBulletsList)
         |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBallsWithId)
-        -- |> reversePrepend (Collision.ballBallAll duration allBallsWithId)
+        |> reversePrepend (Collision.ballBallAll duration allBallsWithId)
         -- |> reversePrepend (Collision.ballWallAll duration allBallsWithId)
         |> reversePrepend (Collision.bulletWallAll duration allBulletsList)
 

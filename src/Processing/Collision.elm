@@ -1,5 +1,6 @@
 module Processing.Collision exposing
     ( Kind(..)
+    , ballBallAll
     , bulletBallAll
     , bulletWallAll
     , playerBulletAll
@@ -251,8 +252,68 @@ collideBallWithBullet duration ( ballId, ball ) ( id, bullet ) =
 
 ballBallAll : Int -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
 ballBallAll duration balls =
-    -- Debug.todo "ballBallAll"
-    []
+    case balls of
+        b1 :: b2 :: [] ->
+            collideBallWithBall duration b1 b2
+                |> Maybe.map List.singleton
+                |> Maybe.withDefault []
+
+        b1 :: b2 :: b3 :: [] ->
+            [ ( b1, b2 ), ( b1, b3 ), ( b2, b3 ) ]
+                |> List.filterMap (\( b_1, b_2 ) -> collideBallWithBall duration b_1 b_2)
+
+        _ ->
+            []
+
+
+collideBallWithBall : Int -> ( Int, Ball ) -> ( Int, Ball ) -> Maybe { time : Float, kind : Kind }
+collideBallWithBall duration ( id1, ball1 ) ( id2, ball2 ) =
+    let
+        a =
+            fromTo ball1.speed ball2.speed
+
+        b =
+            fromTo ball1.pos ball2.pos
+
+        d =
+            2 * Ball.size
+
+        -- for t in [0,duration], solve | a * t + b | <= d
+        aa =
+            norm2 a
+
+        bb =
+            norm2 b
+
+        ab =
+            dot a b
+
+        dd =
+            d * d
+
+        discriminant =
+            ab * ab - aa * (bb - dd)
+    in
+    if discriminant < 0 then
+        Nothing
+
+    else
+        let
+            sqDiscriminant =
+                sqrt discriminant
+
+            t1 =
+                (-ab - sqDiscriminant) / aa
+
+            t2 =
+                (-ab + sqDiscriminant) / aa
+        in
+        -- check that [t1,t2] intersects [0,duration]
+        if t2 >= 0 && t1 <= toFloat duration then
+            Just { time = max 0 t1, kind = BallBall id1 id2 }
+
+        else
+            Nothing
 
 
 
