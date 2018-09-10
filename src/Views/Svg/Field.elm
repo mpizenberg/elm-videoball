@@ -29,7 +29,7 @@ background =
         , Svg.Attributes.y "0"
         , Svg.Attributes.width stringFieldWidth
         , Svg.Attributes.height stringFieldHeight
-        , Svg.Attributes.fill "pink"
+        , Svg.Attributes.fill "#f9ecfe"
         ]
         []
 
