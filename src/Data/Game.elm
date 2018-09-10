@@ -7,6 +7,7 @@ module Data.Game exposing
     )
 
 import Data.Helper exposing (Four, OneOfFour(..))
+import Data.ListExtra exposing (reversePrepend)
 import Data.Vector as Vector
 import Dict exposing (Dict)
 import Physical.Ball as Ball exposing (Ball)
@@ -432,16 +433,6 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
 triple : a -> b -> c -> ( a, b, c )
 triple a b c =
     ( a, b, c )
-
-
-reversePrepend : List a -> List a -> List a
-reversePrepend list1 list2 =
-    case list1 of
-        [] ->
-            list2
-
-        l :: ls ->
-            reversePrepend ls (l :: list2)
 
 
 

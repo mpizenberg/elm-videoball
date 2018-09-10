@@ -9,8 +9,9 @@ module Processing.Collision exposing
     , playerPlayerAll
     )
 
-import Data.Combination exposing (pairs)
 import Data.Helper exposing (OneOfFour(..))
+import Data.ListExtra as ListExtra exposing (reversePrepend)
+import Data.Vector as Vector
 import Physical.Ball as Ball exposing (Ball)
 import Physical.Bullet as Bullet exposing (Bullet)
 import Physical.Field as Field
@@ -33,7 +34,7 @@ type Kind
 
 
 
---
+-- players with players
 
 
 playerPlayerAll : Int -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
@@ -43,7 +44,7 @@ playerPlayerAll duration p1 p2 p3 p4 =
 
 
 
---
+-- players with walls
 
 
 playerWallAll : Int -> Player -> Player -> Player -> Player -> List { time : Float, kind : Kind }
@@ -53,7 +54,7 @@ playerWallAll duration p1 p2 p3 p4 =
 
 
 
---
+-- players with bullets
 
 
 playerBulletAll : Int -> Player -> Player -> Player -> Player -> List ( Int, Bullet ) -> List { time : Float, kind : Kind }
@@ -76,23 +77,23 @@ collidePlayerWithBullet duration ( oneOfFour, player ) ( bulletId, bullet ) =
             Bullet.radiusAndSpeed bullet
 
         a =
-            fromTo player.speed ( bulletSpeedX, bulletSpeedY )
+            Vector.fromTo player.speed ( bulletSpeedX, bulletSpeedY )
 
         b =
-            fromTo player.pos bullet.pos
+            Vector.fromTo player.pos bullet.pos
 
         d =
             Player.size + bulletRadius
 
         -- for t in [0,duration], solve | a * t + b | <= d
         aa =
-            norm2 a
+            Vector.norm2 a
 
         bb =
-            norm2 b
+            Vector.norm2 b
 
         ab =
-            dot a b
+            Vector.dot a b
 
         dd =
             d * d
@@ -123,7 +124,7 @@ collidePlayerWithBullet duration ( oneOfFour, player ) ( bulletId, bullet ) =
 
 
 
---
+-- players with balls
 
 
 playerBallAll : Int -> Player -> Player -> Player -> Player -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
@@ -133,14 +134,69 @@ playerBallAll duration p1 p2 p3 p4 balls =
 
 
 
---
+-- bullets with bullets
 
 
 bulletBulletAll : Int -> List ( Int, Bullet ) -> List { time : Float, kind : Kind }
 bulletBulletAll duration bullets =
-    -- Debug.todo "bulletBulletAll"
-    pairs bullets
+    ListExtra.pairs bullets
         |> List.filterMap (\( b1, b2 ) -> collideBulletWithBullet duration b1 b2)
+
+
+collideBulletWithBullet : Int -> ( Int, Bullet ) -> ( Int, Bullet ) -> Maybe { time : Float, kind : Kind }
+collideBulletWithBullet duration ( id1, bullet1 ) ( id2, bullet2 ) =
+    let
+        ( radius1, speedX1, speedY1 ) =
+            Bullet.radiusAndSpeed bullet1
+
+        ( radius2, speedX2, speedY2 ) =
+            Bullet.radiusAndSpeed bullet2
+
+        a =
+            Vector.fromTo ( speedX1, speedX2 ) ( speedX2, speedY2 )
+
+        b =
+            Vector.fromTo bullet1.pos bullet2.pos
+
+        d =
+            radius1 + radius2
+
+        -- for t in [0,duration], solve | a * t + b | <= d
+        aa =
+            Vector.norm2 a
+
+        bb =
+            Vector.norm2 b
+
+        ab =
+            Vector.dot a b
+
+        dd =
+            d * d
+
+        discriminant =
+            ab * ab - aa * (bb - dd)
+    in
+    if discriminant < 0 then
+        Nothing
+
+    else
+        let
+            sqDiscriminant =
+                sqrt discriminant
+
+            t1 =
+                (-ab - sqDiscriminant) / aa
+
+            t2 =
+                (-ab + sqDiscriminant) / aa
+        in
+        -- check that [t1,t2] intersects [0,duration]
+        if t2 >= 0 && t1 <= toFloat duration then
+            Just { time = max 0 t1, kind = BulletBullet id1 id2 }
+
+        else
+            Nothing
 
 
 
@@ -204,23 +260,23 @@ collideBallWithBullet duration ( ballId, ball ) ( id, bullet ) =
             Bullet.radiusAndSpeed bullet
 
         a =
-            fromTo ball.speed ( bulletSpeedX, bulletSpeedY )
+            Vector.fromTo ball.speed ( bulletSpeedX, bulletSpeedY )
 
         b =
-            fromTo ball.pos bullet.pos
+            Vector.fromTo ball.pos bullet.pos
 
         d =
             Ball.size + bulletRadius
 
         -- for t in [0,duration], solve | a * t + b | <= d
         aa =
-            norm2 a
+            Vector.norm2 a
 
         bb =
-            norm2 b
+            Vector.norm2 b
 
         ab =
-            dot a b
+            Vector.dot a b
 
         dd =
             d * d
@@ -251,7 +307,7 @@ collideBallWithBullet duration ( ballId, ball ) ( id, bullet ) =
 
 
 
---
+-- balls with balls
 
 
 ballBallAll : Int -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
@@ -274,23 +330,23 @@ collideBallWithBall : Int -> ( Int, Ball ) -> ( Int, Ball ) -> Maybe { time : Fl
 collideBallWithBall duration ( id1, ball1 ) ( id2, ball2 ) =
     let
         a =
-            fromTo ball1.speed ball2.speed
+            Vector.fromTo ball1.speed ball2.speed
 
         b =
-            fromTo ball1.pos ball2.pos
+            Vector.fromTo ball1.pos ball2.pos
 
         d =
             2 * Ball.size
 
         -- for t in [0,duration], solve | a * t + b | <= d
         aa =
-            norm2 a
+            Vector.norm2 a
 
         bb =
-            norm2 b
+            Vector.norm2 b
 
         ab =
-            dot a b
+            Vector.dot a b
 
         dd =
             d * d
@@ -321,7 +377,7 @@ collideBallWithBall duration ( id1, ball1 ) ( id2, ball2 ) =
 
 
 
---
+-- balls with walls
 
 
 ballWallAll : Int -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
@@ -359,83 +415,8 @@ collideBallWithWalls duration ( id, ball ) =
         |> List.filterMap identity
 
 
-collideBulletWithBullet : Int -> ( Int, Bullet ) -> ( Int, Bullet ) -> Maybe { time : Float, kind : Kind }
-collideBulletWithBullet duration ( id1, bullet1 ) ( id2, bullet2 ) =
-    let
-        ( radius1, speedX1, speedY1 ) =
-            Bullet.radiusAndSpeed bullet1
 
-        ( radius2, speedX2, speedY2 ) =
-            Bullet.radiusAndSpeed bullet2
-
-        a =
-            fromTo ( speedX1, speedX2 ) ( speedX2, speedY2 )
-
-        b =
-            fromTo bullet1.pos bullet2.pos
-
-        d =
-            radius1 + radius2
-
-        -- for t in [0,duration], solve | a * t + b | <= d
-        aa =
-            norm2 a
-
-        bb =
-            norm2 b
-
-        ab =
-            dot a b
-
-        dd =
-            d * d
-
-        discriminant =
-            ab * ab - aa * (bb - dd)
-    in
-    if discriminant < 0 then
-        Nothing
-
-    else
-        let
-            sqDiscriminant =
-                sqrt discriminant
-
-            t1 =
-                (-ab - sqDiscriminant) / aa
-
-            t2 =
-                (-ab + sqDiscriminant) / aa
-        in
-        -- check that [t1,t2] intersects [0,duration]
-        if t2 >= 0 && t1 <= toFloat duration then
-            Just { time = max 0 t1, kind = BulletBullet id1 id2 }
-
-        else
-            Nothing
-
-
-
---
-
-
-type alias Pos =
-    ( Float, Float )
-
-
-norm2 : ( Float, Float ) -> Float
-norm2 ( x, y ) =
-    x * x + y * y
-
-
-dot : ( Float, Float ) -> ( Float, Float ) -> Float
-dot ( x1, y1 ) ( x2, y2 ) =
-    x1 * x2 + y1 * y2
-
-
-fromTo : Pos -> Pos -> ( Float, Float )
-fromTo ( x1, y1 ) ( x2, y2 ) =
-    ( x2 - x1, y2 - y1 )
+-- helper functions
 
 
 makeCollisionIfLowerThan : Int -> Kind -> Float -> Maybe { time : Float, kind : Kind }
@@ -497,13 +478,3 @@ timeOfCollideWithBottomWall radius y vY =
 
     else
         distance / vY
-
-
-reversePrepend : List a -> List a -> List a
-reversePrepend list1 list2 =
-    case list1 of
-        [] ->
-            list2
-
-        l :: ls ->
-            reversePrepend ls (l :: list2)

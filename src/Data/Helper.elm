@@ -1,7 +1,6 @@
 module Data.Helper exposing
     ( Four
     , OneOfFour(..)
-    , OneOfThree(..)
     )
 
 
@@ -18,9 +17,3 @@ type OneOfFour
     | Deux
     | Trois
     | Quatre
-
-
-type OneOfThree
-    = One
-    | Two
-    | Three
