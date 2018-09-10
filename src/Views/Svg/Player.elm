@@ -80,7 +80,7 @@ view color { pos, direction, shootPrep, stunned, timeState } =
                     ( "0", 0 )
 
                 Just prepTime ->
-                    ( "0.5", Time.posixToMillis timeState - Time.posixToMillis prepTime )
+                    ( "0.8", Time.posixToMillis timeState - Time.posixToMillis prepTime )
 
         shootDiskSize =
             if prepDuration > Player.bigChargeTime then
