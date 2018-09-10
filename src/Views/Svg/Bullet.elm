@@ -1,25 +1,41 @@
 module Views.Svg.Bullet exposing (view)
 
+import Data.Helper exposing (OneOfFour(..))
 import Physical.Bullet as Bullet exposing (Bullet)
 import Svg exposing (Svg)
 import Svg.Attributes
 
 
-view : Bullet -> Svg msg
-view bullet =
+view : { playerId : OneOfFour, bullet : Bullet } -> Svg msg
+view { playerId, bullet } =
+    let
+        color =
+            case playerId of
+                Un ->
+                    "#9f6300"
+
+                Deux ->
+                    "#9f6300"
+
+                Trois ->
+                    "#004b16"
+
+                Quatre ->
+                    "#004b16"
+    in
     case bullet.size of
         Bullet.Small ->
-            viewTriangle Bullet.smallSize bullet.direction bullet.pos
+            viewTriangle color Bullet.smallSize bullet.direction bullet.pos
 
         Bullet.Medium ->
-            viewTriangle Bullet.mediumSize bullet.direction bullet.pos
+            viewTriangle color Bullet.mediumSize bullet.direction bullet.pos
 
         Bullet.Big ->
-            viewTriangle Bullet.bigSize bullet.direction bullet.pos
+            viewTriangle color Bullet.bigSize bullet.direction bullet.pos
 
 
-viewTriangle : Float -> Float -> ( Float, Float ) -> Svg msg
-viewTriangle size direction ( x, y ) =
+viewTriangle : String -> Float -> Float -> ( Float, Float ) -> Svg msg
+viewTriangle color size direction ( x, y ) =
     let
         dirB =
             direction + 2 * pi / 3
@@ -51,4 +67,9 @@ viewTriangle size direction ( x, y ) =
                 , String.fromFloat yC
                 ]
     in
-    Svg.polygon [ Svg.Attributes.points points ] []
+    Svg.polygon
+        [ Svg.Attributes.points points
+        , Svg.Attributes.fill color
+        , Svg.Attributes.stroke "black"
+        ]
+        []

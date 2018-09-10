@@ -51,7 +51,7 @@ viewField frameSize game =
         bullets =
             game.bullets
                 |> Dict.values
-                |> List.map (.bullet >> Views.Svg.Bullet.view)
+                |> List.map Views.Svg.Bullet.view
                 |> Svg.g []
 
         balls =
