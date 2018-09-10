@@ -86,14 +86,14 @@ bigSpeed =
 
 smallSize : Float
 smallSize =
-    40
+    20
 
 
 mediumSize : Float
 mediumSize =
-    60
+    40
 
 
 bigSize : Float
 bigSize =
-    80
+    60

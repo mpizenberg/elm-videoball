@@ -14,7 +14,7 @@ import Time
 
 size : Float
 size =
-    80
+    60
 
 
 type alias Ball =
