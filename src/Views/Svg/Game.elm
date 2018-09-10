@@ -25,13 +25,17 @@ viewScore ( score1, score2 ) startTime frameTime =
         durationInSeconds =
             durationInMillis // 1000
     in
-    Html.p [ Html.Attributes.style "height" "50px" ]
+    Html.p
+        [ Html.Attributes.style "text-align" "center"
+        , Html.Attributes.style "font-size" "4rem"
+        ]
         [ Html.text <|
             String.concat
                 [ String.fromInt score1
                 , " --- "
-                , String.fromInt durationInSeconds
-                , " --- "
+
+                -- , String.fromInt durationInSeconds
+                -- , " --- "
                 , String.fromInt score2
                 ]
         ]
