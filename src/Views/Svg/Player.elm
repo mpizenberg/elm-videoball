@@ -6,8 +6,8 @@ import Svg.Attributes
 import Time
 
 
-view : Player -> Svg msg
-view { pos, direction, shootPrep, stunned, timeState } =
+view : String -> Player -> Svg msg
+view color { pos, direction, shootPrep, stunned, timeState } =
     let
         dirB =
             direction + 2 * pi / 3
@@ -47,7 +47,12 @@ view { pos, direction, shootPrep, stunned, timeState } =
                 ]
 
         player =
-            Svg.polygon [ Svg.Attributes.points points ] []
+            Svg.polygon
+                [ Svg.Attributes.points points
+                , Svg.Attributes.fill color
+                , Svg.Attributes.stroke "black"
+                ]
+                []
 
         -- stunn
         stunOpacity =

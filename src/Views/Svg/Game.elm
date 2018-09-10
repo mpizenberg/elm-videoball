@@ -41,9 +41,12 @@ viewField : { width : Float, height : Float } -> Game -> Html msg
 viewField frameSize game =
     let
         players =
-            Game.allPlayers game
-                |> List.map Views.Svg.Player.view
-                |> Svg.g []
+            Svg.g []
+                [ Views.Svg.Player.view "darkorange" game.player1
+                , Views.Svg.Player.view "darkorange" game.player2
+                , Views.Svg.Player.view "green" game.player3
+                , Views.Svg.Player.view "green" game.player4
+                ]
 
         bullets =
             game.bullets
