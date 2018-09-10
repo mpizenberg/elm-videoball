@@ -61,4 +61,10 @@ viewField frameSize game =
                 |> Svg.g []
     in
     Views.Svg.Field.view
-        [ Views.Svg.Field.background, balls, bullets, players ]
+        [ Views.Svg.Field.background
+        , Views.Svg.Field.leftGoal
+        , Views.Svg.Field.rightGoal
+        , balls
+        , bullets
+        , players
+        ]
