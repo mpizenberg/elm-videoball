@@ -6,6 +6,9 @@ elm-stuff
 # elm-repl generated files
 repl-temp-*
 
+### elm-videoball build artefacts ###
+Main.js
+
 ### Linux ###
 *~
 
