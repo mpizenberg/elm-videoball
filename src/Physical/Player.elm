@@ -1,19 +1,20 @@
-module Physical.Player exposing
-    ( Control
-    , HasShot(..)
-    , Player
-    , bigChargeTime
-    , checkWallObstacle
-    , init
-    , mediumChargeTime
-    , moveDuring
-    , moveUntil
-    , prepareMovement
-    , shotRecoil
-    , size
-    , stun
-    , updateShot
-    )
+module Physical.Player
+    exposing
+        ( Control
+        , HasShot(..)
+        , Player
+        , bigChargeTime
+        , checkWallObstacle
+        , init
+        , mediumChargeTime
+        , moveDuring
+        , moveUntil
+        , prepareMovement
+        , shotRecoil
+        , size
+        , stun
+        , updateShot
+        )
 
 import Time
 
@@ -111,7 +112,6 @@ prepareMovement duration thrusting direction player =
         stunned =
             if stillStunned then
                 player.stunned
-
             else
                 Nothing
 
@@ -120,18 +120,17 @@ prepareMovement duration thrusting direction player =
                 ( viscosityCoef * oldVX
                 , viscosityCoef * oldVY
                 )
-
             else
                 ( viscosityCoef * oldVX + thrust * cos direction
                 , viscosityCoef * oldVY + thrust * sin direction
                 )
     in
-    { player
-        | thrusting = thrusting
-        , direction = direction
-        , speed = speed
-        , stunned = stunned
-    }
+        { player
+            | thrusting = thrusting
+            , direction = direction
+            , speed = speed
+            , stunned = stunned
+        }
 
 
 moveDuring : Float -> Player -> Player
@@ -141,7 +140,7 @@ moveDuring duration player =
             (Time.posixToMillis player.timeState + floor duration)
                 |> Time.millisToPosix
     in
-    moveUntil time player
+        moveUntil time player
 
 
 moveUntil : Time.Posix -> Player -> Player
@@ -158,7 +157,7 @@ moveUntil time player =
             , Tuple.second player.pos + vY * deltaTime
             )
     in
-    { player | pos = pos, timeState = time }
+        { player | pos = pos, timeState = time }
 
 
 checkWallObstacle : Float -> Float -> Float -> Float -> Player -> Player
@@ -187,10 +186,8 @@ checkWallObstacle left right top bottom player =
             -- with amortization
             if x < leftLimit then
                 ( leftLimit + 0.5 * (leftLimit - x), -0.5 * vX )
-
             else if x > rightLimit then
                 ( rightLimit - 0.5 * (x - rightLimit), -0.5 * vX )
-
             else
                 ( x, vX )
 
@@ -198,14 +195,12 @@ checkWallObstacle left right top bottom player =
             -- with amortization
             if y < topLimit then
                 ( topLimit + 0.5 * (topLimit - y), -0.5 * vY )
-
             else if y > bottomLimit then
                 ( bottomLimit - 0.5 * (y - bottomLimit), -0.5 * vY )
-
             else
                 ( y, vY )
     in
-    { player | pos = ( newX, newY ), speed = ( newVX, newVY ) }
+        { player | pos = ( newX, newY ), speed = ( newVX, newVY ) }
 
 
 
@@ -228,7 +223,7 @@ updateShot spaceBarDown player =
                 duration =
                     Time.posixToMillis player.timeState - Time.posixToMillis prepTime
             in
-            ( { player | shootPrep = Nothing }, ShotAfter duration )
+                ( { player | shootPrep = Nothing }, ShotAfter duration )
 
         _ ->
             ( player, NoShot )
@@ -243,10 +238,8 @@ shotRecoil chargeDuration player =
         recoilForce =
             if chargeDuration > bigChargeTime then
                 1.2
-
             else if chargeDuration > mediumChargeTime then
                 0.8
-
             else
                 0.4
 
@@ -255,4 +248,4 @@ shotRecoil chargeDuration player =
             , vY - recoilForce * sin player.direction
             )
     in
-    { player | speed = newSpeed }
+        { player | speed = newSpeed }

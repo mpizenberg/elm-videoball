@@ -1,9 +1,10 @@
-module Views.Svg.Field exposing
-    ( background
-    , leftGoal
-    , rightGoal
-    , view
-    )
+module Views.Svg.Field
+    exposing
+        ( background
+        , leftGoal
+        , rightGoal
+        , view
+        )
 
 import Html exposing (Html)
 import Html.Attributes
@@ -11,6 +12,7 @@ import Physical.Ball as Ball
 import Physical.Field as Field
 import Svg exposing (Svg)
 import Svg.Attributes
+import Views.Colors
 
 
 view : List (Svg msg) -> Html msg
@@ -32,7 +34,7 @@ background =
         , Svg.Attributes.y "0"
         , Svg.Attributes.width stringFieldWidth
         , Svg.Attributes.height stringFieldHeight
-        , Svg.Attributes.fill "#f9ecfe"
+        , Svg.Attributes.fill Views.Colors.fieldBackground
         ]
         []
 
@@ -44,8 +46,7 @@ leftGoal =
         , Svg.Attributes.y "0"
         , Svg.Attributes.width leftGoalLimit
         , Svg.Attributes.height stringFieldHeight
-        , Svg.Attributes.fill "orange"
-        , Svg.Attributes.opacity "0.5"
+        , Svg.Attributes.fill Views.Colors.netA
         ]
         []
 
@@ -57,8 +58,7 @@ rightGoal =
         , Svg.Attributes.y "0"
         , Svg.Attributes.width leftGoalLimit
         , Svg.Attributes.height stringFieldHeight
-        , Svg.Attributes.fill "green"
-        , Svg.Attributes.opacity "0.5"
+        , Svg.Attributes.fill Views.Colors.netB
         ]
         []
 

@@ -4,6 +4,7 @@ import Physical.Player as Player exposing (Player, size)
 import Svg exposing (Svg)
 import Svg.Attributes
 import Time
+import Views.Colors
 
 
 view : String -> Player -> Svg msg
@@ -49,8 +50,9 @@ view color { pos, direction, shootPrep, stunned, timeState } =
         player =
             Svg.polygon
                 [ Svg.Attributes.points points
-                , Svg.Attributes.fill color
-                , Svg.Attributes.stroke "black"
+                , Svg.Attributes.fill "transparent"
+                , Svg.Attributes.stroke color
+                , Svg.Attributes.strokeWidth "10"
                 ]
                 []
 
@@ -68,7 +70,7 @@ view color { pos, direction, shootPrep, stunned, timeState } =
                 [ Svg.Attributes.cx (String.fromFloat x)
                 , Svg.Attributes.cy (String.fromFloat y)
                 , Svg.Attributes.r (String.fromFloat size)
-                , Svg.Attributes.fill "gray"
+                , Svg.Attributes.fill Views.Colors.stunDisk
                 , Svg.Attributes.opacity stunOpacity
                 ]
                 []
@@ -85,10 +87,8 @@ view color { pos, direction, shootPrep, stunned, timeState } =
         shootDiskSize =
             if prepDuration > Player.bigChargeTime then
                 "40"
-
             else if prepDuration > Player.mediumChargeTime then
                 "30"
-
             else
                 "20"
 
@@ -97,9 +97,9 @@ view color { pos, direction, shootPrep, stunned, timeState } =
                 [ Svg.Attributes.cx (String.fromFloat xA)
                 , Svg.Attributes.cy (String.fromFloat yA)
                 , Svg.Attributes.r shootDiskSize
-                , Svg.Attributes.fill "white"
+                , Svg.Attributes.fill Views.Colors.shootDisk
                 , Svg.Attributes.opacity shootOpacity
                 ]
                 []
     in
-    Svg.g [] [ stunDisk, player, shootDisk ]
+        Svg.g [] [ stunDisk, player, shootDisk ]
