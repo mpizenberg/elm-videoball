@@ -1,10 +1,9 @@
-module Views.Svg.Field
-    exposing
-        ( background
-        , leftGoal
-        , rightGoal
-        , view
-        )
+module Views.Svg.Field exposing
+    ( background
+    , leftGoal
+    , rightGoal
+    , view
+    )
 
 import Html exposing (Html)
 import Html.Attributes

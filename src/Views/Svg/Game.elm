@@ -1,8 +1,7 @@
-module Views.Svg.Game
-    exposing
-        ( viewField
-        , viewScoreboard
-        )
+module Views.Svg.Game exposing
+    ( viewField
+    , viewScoreboard
+    )
 
 import Data.Game as Game exposing (Game)
 import Dict exposing (Dict)
@@ -11,11 +10,11 @@ import Html.Attributes
 import Physical.Bullet exposing (Bullet)
 import Svg exposing (Svg)
 import Time
+import Views.Colors
 import Views.Svg.Ball
 import Views.Svg.Bullet
 import Views.Svg.Field
 import Views.Svg.Player
-import Views.Colors
 
 
 viewScoreboard : ( Int, Int ) -> Time.Posix -> Time.Posix -> Html msg
@@ -27,15 +26,15 @@ viewScoreboard ( score1, score2 ) startTime frameTime =
         durationInSeconds =
             durationInMillis // 1000
     in
-        Html.div
-            [ Html.Attributes.style "display" "flex"
-            , Html.Attributes.style "justify-content" "center"
-            , Html.Attributes.style "align-items" "center"
-            ]
-            [ viewScore score1 Views.Colors.netA
-            , viewTime durationInSeconds
-            , viewScore score2 Views.Colors.netB
-            ]
+    Html.div
+        [ Html.Attributes.style "display" "flex"
+        , Html.Attributes.style "justify-content" "center"
+        , Html.Attributes.style "align-items" "center"
+        ]
+        [ viewScore score1 Views.Colors.netA
+        , viewTime durationInSeconds
+        , viewScore score2 Views.Colors.netB
+        ]
 
 
 viewScore : Int -> String -> Html msg
@@ -89,11 +88,11 @@ viewField frameSize game =
                 |> List.map Views.Svg.Ball.view
                 |> Svg.g []
     in
-        Views.Svg.Field.view
-            [ Views.Svg.Field.background
-            , Views.Svg.Field.leftGoal
-            , Views.Svg.Field.rightGoal
-            , balls
-            , bullets
-            , players
-            ]
+    Views.Svg.Field.view
+        [ Views.Svg.Field.background
+        , Views.Svg.Field.leftGoal
+        , Views.Svg.Field.rightGoal
+        , balls
+        , bullets
+        , players
+        ]

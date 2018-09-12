@@ -54,19 +54,19 @@ init { time, size } =
         gamepadTime =
             0
     in
-        ( { size = size
-          , frameSize = size
-          , frameTime = Time.millisToPosix gamepadTime
-          , game = Game.init (Time.millisToPosix gamepadTime)
-          , playerControls =
-                { one = Player.Control Nothing False
-                , two = Player.Control Nothing False
-                , three = Player.Control Nothing False
-                , four = Player.Control Nothing False
-                }
-          }
-        , Cmd.none
-        )
+    ( { size = size
+      , frameSize = size
+      , frameTime = Time.millisToPosix gamepadTime
+      , game = Game.init (Time.millisToPosix gamepadTime)
+      , playerControls =
+            { one = Player.Control Nothing False
+            , two = Player.Control Nothing False
+            , three = Player.Control Nothing False
+            , four = Player.Control Nothing False
+            }
+      }
+    , Cmd.none
+    )
 
 
 subscriptions : Model -> Sub Msg
@@ -97,14 +97,14 @@ update msg model =
                 newPlayerControls =
                     Gamepad.updatePlayerControls gamepads model.playerControls
             in
-                ( { model
-                    | frameSize = model.size
-                    , frameTime = newFrameTime
-                    , playerControls = newPlayerControls
-                    , game = Game.update newFrameTime duration newPlayerControls model.game
-                  }
-                , Cmd.none
-                )
+            ( { model
+                | frameSize = model.size
+                , frameTime = newFrameTime
+                , playerControls = newPlayerControls
+                , game = Game.update newFrameTime duration newPlayerControls model.game
+              }
+            , Cmd.none
+            )
 
 
 

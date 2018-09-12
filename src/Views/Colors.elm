@@ -1,19 +1,18 @@
-module Views.Colors
-    exposing
-        ( playerA
-        , playerB
-        , playerContour
-        , fieldBackground
-        , netA
-        , netB
-        , ball
-        , bulletA
-        , bulletB
-        , stunDisk
-        , shootDisk
-        , textDark
-        , textLight
-        )
+module Views.Colors exposing
+    ( ball
+    , bulletA
+    , bulletB
+    , fieldBackground
+    , netA
+    , netB
+    , playerA
+    , playerB
+    , playerContour
+    , shootDisk
+    , stunDisk
+    , textDark
+    , textLight
+    )
 
 -- Color values
 

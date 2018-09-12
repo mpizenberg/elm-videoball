@@ -12,10 +12,10 @@ view { pos, speed, superspeed } =
         ( x, y ) =
             pos
     in
-        Svg.circle
-            [ Svg.Attributes.cx (String.fromFloat x)
-            , Svg.Attributes.cy (String.fromFloat y)
-            , Svg.Attributes.r (String.fromFloat Ball.size)
-            , Svg.Attributes.fill Views.Colors.ball
-            ]
-            []
+    Svg.circle
+        [ Svg.Attributes.cx (String.fromFloat x)
+        , Svg.Attributes.cy (String.fromFloat y)
+        , Svg.Attributes.r (String.fromFloat Ball.size)
+        , Svg.Attributes.fill Views.Colors.ball
+        ]
+        []

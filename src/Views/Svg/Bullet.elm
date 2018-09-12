@@ -24,15 +24,15 @@ view { playerId, bullet } =
                 Quatre ->
                     Views.Colors.bulletB
     in
-        case bullet.size of
-            Bullet.Small ->
-                viewTriangle color Bullet.smallSize bullet.direction bullet.pos
+    case bullet.size of
+        Bullet.Small ->
+            viewTriangle color Bullet.smallSize bullet.direction bullet.pos
 
-            Bullet.Medium ->
-                viewTriangle color Bullet.mediumSize bullet.direction bullet.pos
+        Bullet.Medium ->
+            viewTriangle color Bullet.mediumSize bullet.direction bullet.pos
 
-            Bullet.Big ->
-                viewTriangle color Bullet.bigSize bullet.direction bullet.pos
+        Bullet.Big ->
+            viewTriangle color Bullet.bigSize bullet.direction bullet.pos
 
 
 viewTriangle : String -> Float -> Float -> ( Float, Float ) -> Svg msg
@@ -68,8 +68,8 @@ viewTriangle color size direction ( x, y ) =
                 , String.fromFloat yC
                 ]
     in
-        Svg.polygon
-            [ Svg.Attributes.points points
-            , Svg.Attributes.fill color
-            ]
-            []
+    Svg.polygon
+        [ Svg.Attributes.points points
+        , Svg.Attributes.fill color
+        ]
+        []

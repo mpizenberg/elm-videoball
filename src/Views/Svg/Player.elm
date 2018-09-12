@@ -87,8 +87,10 @@ view color { pos, direction, shootPrep, stunned, timeState } =
         shootDiskSize =
             if prepDuration > Player.bigChargeTime then
                 "40"
+
             else if prepDuration > Player.mediumChargeTime then
                 "30"
+
             else
                 "20"
 
@@ -102,4 +104,4 @@ view color { pos, direction, shootPrep, stunned, timeState } =
                 ]
                 []
     in
-        Svg.g [] [ stunDisk, player, shootDisk ]
+    Svg.g [] [ stunDisk, player, shootDisk ]
