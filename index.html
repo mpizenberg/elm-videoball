@@ -1,31 +1,47 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>Videoball in Elm</title>
 	<meta charset="UTF-8">
+	<link href="https://fonts.googleapis.com/css?family=Graduate" rel="stylesheet">
 	<style type="text/css">
-		html, body, div, p {margin: 0; padding:0;}
-		html, body { height: 100%; }
+		html,
+		body,
+		div,
+		p {
+			margin: 0;
+			padding: 0;
+		}
+
+		html,
+		body {
+			font-family: 'Graduate';
+			background: #1C282D;
+			height: 100%;
+		}
 	</style>
 	<script src="Main.js"></script>
 	<script src="gamepadPort.js"></script>
 </head>
+
 <body>
 	<div id="elm"></div>
 	<script charset="utf-8">
-	// Function returning the size of the layout viewport.
-	const layoutViewportSize = () => ({
-		width: document.documentElement.clientWidth,
-		height: document.documentElement.clientHeight
-	});
-	const app = Elm.Main.init({
-		node: document.getElementById("elm"),
-		flags: {time: Date.now(), size: layoutViewportSize()}
-	});
-	window.addEventListener("resize", () =>
-		app.ports.resizes.send(layoutViewportSize())
-	);
-	addGamepadPort(app);
+		// Function returning the size of the layout viewport.
+		const layoutViewportSize = () => ({
+			width: document.documentElement.clientWidth,
+			height: document.documentElement.clientHeight
+		});
+		const app = Elm.Main.init({
+			node: document.getElementById("elm"),
+			flags: { time: Date.now(), size: layoutViewportSize() }
+		});
+		window.addEventListener("resize", () =>
+			app.ports.resizes.send(layoutViewportSize())
+		);
+		addGamepadPort(app);
 	</script>
 </body>
+
 </html>

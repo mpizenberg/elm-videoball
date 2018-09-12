@@ -30,7 +30,7 @@ viewScore ( score1, score2 ) startTime frameTime =
         Html.p
             [ Html.Attributes.style "text-align" "center"
             , Html.Attributes.style "font-size" "4rem"
-            , Html.Attributes.style "color" Views.Colors.textDark
+            , Html.Attributes.style "color" Views.Colors.textLight
             ]
             [ Html.text <|
                 String.concat

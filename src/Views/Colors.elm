@@ -12,6 +12,7 @@ module Views.Colors
         , stunDisk
         , shootDisk
         , textDark
+        , textLight
         )
 
 -- Color values
@@ -95,3 +96,7 @@ stunDisk =
 
 textDark =
     gray
+
+
+textLight =
+    white
