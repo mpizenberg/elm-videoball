@@ -35,7 +35,7 @@ lightYellow =
 
 
 orange =
-    "rgba(255, 191, 63, 1)"
+    "rgba(239, 163, 0, 1)"
 
 
 blue =
