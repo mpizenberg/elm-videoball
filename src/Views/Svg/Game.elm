@@ -1,7 +1,7 @@
 module Views.Svg.Game
     exposing
         ( viewField
-        , viewScore
+        , viewScoreboard
         )
 
 import Data.Game as Game exposing (Game)
@@ -18,8 +18,8 @@ import Views.Svg.Player
 import Views.Colors
 
 
-viewScore : ( Int, Int ) -> Time.Posix -> Time.Posix -> Html msg
-viewScore ( score1, score2 ) startTime frameTime =
+viewScoreboard : ( Int, Int ) -> Time.Posix -> Time.Posix -> Html msg
+viewScoreboard ( score1, score2 ) startTime frameTime =
     let
         durationInMillis =
             Time.posixToMillis frameTime - Time.posixToMillis startTime
@@ -27,20 +27,43 @@ viewScore ( score1, score2 ) startTime frameTime =
         durationInSeconds =
             durationInMillis // 1000
     in
-        Html.p
-            [ Html.Attributes.style "text-align" "center"
-            , Html.Attributes.style "font-size" "4rem"
-            , Html.Attributes.style "color" Views.Colors.textLight
+        Html.div
+            [ Html.Attributes.style "display" "flex"
+            , Html.Attributes.style "justify-content" "center"
+            , Html.Attributes.style "align-items" "center"
             ]
-            [ Html.text <|
-                String.concat
-                    [ String.fromInt score1
-                    , " --- "
-                      -- , String.fromInt durationInSeconds
-                      -- , " --- "
-                    , String.fromInt score2
-                    ]
+            [ viewScore score1 Views.Colors.netA
+            , viewTime durationInSeconds
+            , viewScore score2 Views.Colors.netB
             ]
+
+
+viewScore : Int -> String -> Html msg
+viewScore score color =
+    Html.div
+        [ Html.Attributes.style "text-align" "center"
+        , Html.Attributes.style "width" "10rem"
+        , Html.Attributes.style "font-size" "4rem"
+        , Html.Attributes.style "color" color
+        , Html.Attributes.style "border" "1rem solid"
+        , Html.Attributes.style "border-color" color
+        ]
+        [ Html.text <|
+            String.fromInt score
+        ]
+
+
+viewTime : Int -> Html msg
+viewTime time =
+    Html.div
+        [ Html.Attributes.style "text-align" "center"
+        , Html.Attributes.style "width" "10rem"
+        , Html.Attributes.style "font-size" "4rem"
+        , Html.Attributes.style "color" Views.Colors.textLight
+        ]
+        [ Html.text <|
+            String.fromInt time
+        ]
 
 
 viewField : { width : Float, height : Float } -> Game -> Html msg
