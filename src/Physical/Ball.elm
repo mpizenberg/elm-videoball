@@ -50,7 +50,7 @@ prepareMovement : Float -> Ball -> Ball
 prepareMovement duration ball =
     let
         viscosityCoef =
-            max 0 (1 - 0.002 * duration)
+            max 0 (1 - 0.0015 * duration)
 
         newSpeed =
             ( viscosityCoef * Tuple.first ball.speed

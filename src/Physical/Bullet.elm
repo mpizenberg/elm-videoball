@@ -71,17 +71,17 @@ moveAtSpeed speed duration ({ pos, direction } as bullet) =
 
 smallSpeed : Float
 smallSpeed =
-    2.2
+    1.4
 
 
 mediumSpeed : Float
 mediumSpeed =
-    1.8
+    1.2
 
 
 bigSpeed : Float
 bigSpeed =
-    1.4
+    1.0
 
 
 smallSize : Float

@@ -179,8 +179,17 @@ processCollision { time, kind } game =
         Collision.BulletBullet id1 id2 ->
             impactBulletBullet id1 id2 game
 
+        -- player - ball
+        Collision.PlayerBall oneOfFour ballId ->
+            impactBallPlayer time ballId oneOfFour game
+
         _ ->
             game
+
+
+impactBallPlayer : Float -> Int -> OneOfFour -> Game -> Game
+impactBallPlayer time ballId oneOfFour game =
+    game
 
 
 impactBulletBullet : Int -> Int -> Game -> Game
@@ -389,13 +398,13 @@ impactBulletOnBall time bullet ball =
         impactForce =
             case bullet.size of
                 Bullet.Small ->
-                    0.5
+                    0.2
 
                 Bullet.Medium ->
                     1.0
 
                 Bullet.Big ->
-                    2.0
+                    3.0
 
         -- TODO later: if big, put ball in superspeed mode
         newSpeed =
@@ -422,7 +431,7 @@ allCollisions endTime ({ player1, player2, player3, player4 } as game) =
     Collision.playerPlayerAll duration player1 player2 player3 player4
         -- |> reversePrepend (Collision.playerWallAll duration player1 player2 player3 player4)
         |> reversePrepend (Collision.playerBulletAll duration player1 player2 player3 player4 allBulletsList)
-        -- |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBallsWithId)
+        |> reversePrepend (Collision.playerBallAll duration player1 player2 player3 player4 allBallsWithId)
         |> reversePrepend (Collision.bulletBulletAll duration allBulletsList)
         |> reversePrepend (Collision.bulletBallAll duration allBulletsList allBallsWithId)
         |> reversePrepend (Collision.ballBallAll duration allBallsWithId)
