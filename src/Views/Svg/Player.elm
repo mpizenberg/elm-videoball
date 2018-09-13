@@ -101,6 +101,7 @@ view color { pos, direction, shootPrep, stunned, timeState } =
                 , Svg.Attributes.r shootDiskSize
                 , Svg.Attributes.fill Views.Colors.shootDisk
                 , Svg.Attributes.opacity shootOpacity
+                , Svg.Attributes.stroke Views.Colors.shootDiskContour
                 ]
                 []
     in
