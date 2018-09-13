@@ -4,6 +4,7 @@ import Data.Helper exposing (OneOfFour(..))
 import Physical.Bullet as Bullet exposing (Bullet)
 import Svg exposing (Svg)
 import Svg.Attributes
+import Views.Colors
 
 
 view : { playerId : OneOfFour, bullet : Bullet } -> Svg msg
@@ -12,16 +13,16 @@ view { playerId, bullet } =
         color =
             case playerId of
                 Un ->
-                    "#9f6300"
+                    Views.Colors.bulletA
 
                 Deux ->
-                    "#9f6300"
+                    Views.Colors.bulletA
 
                 Trois ->
-                    "#004b16"
+                    Views.Colors.bulletB
 
                 Quatre ->
-                    "#004b16"
+                    Views.Colors.bulletB
     in
     case bullet.size of
         Bullet.Small ->
@@ -70,6 +71,5 @@ viewTriangle color size direction ( x, y ) =
     Svg.polygon
         [ Svg.Attributes.points points
         , Svg.Attributes.fill color
-        , Svg.Attributes.stroke "black"
         ]
         []

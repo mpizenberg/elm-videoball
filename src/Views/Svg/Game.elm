@@ -1,6 +1,6 @@
 module Views.Svg.Game exposing
     ( viewField
-    , viewScore
+    , viewScoreboard
     )
 
 import Data.Game as Game exposing (Game)
@@ -10,14 +10,15 @@ import Html.Attributes
 import Physical.Bullet exposing (Bullet)
 import Svg exposing (Svg)
 import Time
+import Views.Colors
 import Views.Svg.Ball
 import Views.Svg.Bullet
 import Views.Svg.Field
 import Views.Svg.Player
 
 
-viewScore : ( Int, Int ) -> Time.Posix -> Time.Posix -> Html msg
-viewScore ( score1, score2 ) startTime frameTime =
+viewScoreboard : ( Int, Int ) -> Time.Posix -> Time.Posix -> Html msg
+viewScoreboard ( score1, score2 ) startTime frameTime =
     let
         durationInMillis =
             Time.posixToMillis frameTime - Time.posixToMillis startTime
@@ -25,19 +26,42 @@ viewScore ( score1, score2 ) startTime frameTime =
         durationInSeconds =
             durationInMillis // 1000
     in
-    Html.p
+    Html.div
+        [ Html.Attributes.style "display" "flex"
+        , Html.Attributes.style "justify-content" "center"
+        , Html.Attributes.style "align-items" "center"
+        ]
+        [ viewScore score1 Views.Colors.netA
+        , viewTime durationInSeconds
+        , viewScore score2 Views.Colors.netB
+        ]
+
+
+viewScore : Int -> String -> Html msg
+viewScore score color =
+    Html.div
         [ Html.Attributes.style "text-align" "center"
+        , Html.Attributes.style "width" "10rem"
         , Html.Attributes.style "font-size" "4rem"
+        , Html.Attributes.style "color" color
+        , Html.Attributes.style "border" "1rem solid"
+        , Html.Attributes.style "border-color" color
         ]
         [ Html.text <|
-            String.concat
-                [ String.fromInt score1
-                , " --- "
+            String.fromInt score
+        ]
 
-                -- , String.fromInt durationInSeconds
-                -- , " --- "
-                , String.fromInt score2
-                ]
+
+viewTime : Int -> Html msg
+viewTime time =
+    Html.div
+        [ Html.Attributes.style "text-align" "center"
+        , Html.Attributes.style "width" "10rem"
+        , Html.Attributes.style "font-size" "4rem"
+        , Html.Attributes.style "color" Views.Colors.textLight
+        ]
+        [ Html.text <|
+            String.fromInt time
         ]
 
 
@@ -46,10 +70,10 @@ viewField frameSize game =
     let
         players =
             Svg.g []
-                [ Views.Svg.Player.view "darkorange" game.player1
-                , Views.Svg.Player.view "darkorange" game.player2
-                , Views.Svg.Player.view "green" game.player3
-                , Views.Svg.Player.view "green" game.player4
+                [ Views.Svg.Player.view Views.Colors.playerA game.player1
+                , Views.Svg.Player.view Views.Colors.playerA game.player2
+                , Views.Svg.Player.view Views.Colors.playerB game.player3
+                , Views.Svg.Player.view Views.Colors.playerB game.player4
                 ]
 
         bullets =

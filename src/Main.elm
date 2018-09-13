@@ -118,6 +118,6 @@ view { frameSize, frameTime, game } =
         , Html.Attributes.style "flex-direction" "column"
         , Html.Attributes.style "height" "100%"
         ]
-        [ Views.Svg.Game.viewScore game.score game.startTime frameTime
+        [ Views.Svg.Game.viewScoreboard game.score game.startTime frameTime
         , Views.Svg.Game.viewField frameSize game
         ]
