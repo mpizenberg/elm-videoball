@@ -10,6 +10,7 @@ module Data.Game exposing
 
 import Data.Helper exposing (Four, OneOfFour(..), timeDiff)
 import Data.ListExtra exposing (reversePrepend)
+import Data.Sound as Sound exposing (SoundEffect)
 import Data.Vector as Vector
 import Dict exposing (Dict)
 import Physical.Ball as Ball exposing (Ball)
@@ -88,7 +89,7 @@ playerNumber oneOfFour game =
             game.player4
 
 
-update : Time.Posix -> Int -> Four Player.Control -> Game -> Game
+update : Time.Posix -> Int -> Four Player.Control -> Game -> ( Game, List SoundEffect )
 update newFrameTime duration playerControls game =
     let
         newDirections =
@@ -112,7 +113,7 @@ update newFrameTime duration playerControls game =
             , four = playerControls.four.holdingShot
             }
     in
-    game
+    ( game, [] )
         |> changeGameBalls newFrameTime duration
         |> preparePlayers duration newDirections newThrustings
         |> processCollisionsUntil newFrameTime
@@ -134,8 +135,8 @@ isNothing maybe =
 -- PREPARATION #######################################################
 
 
-preparePlayers : Int -> Four Float -> Four Bool -> Game -> Game
-preparePlayers duration directions thrustings game =
+preparePlayers : Int -> Four Float -> Four Bool -> ( Game, List SoundEffect ) -> ( Game, List SoundEffect )
+preparePlayers duration directions thrustings ( game, sounds ) =
     let
         newPlayer1 =
             Player.prepareMovement duration thrustings.one directions.one game.player1
@@ -149,60 +150,70 @@ preparePlayers duration directions thrustings game =
         newPlayer4 =
             Player.prepareMovement duration thrustings.four directions.four game.player4
     in
-    { game
+    ( { game
         | player1 = newPlayer1
         , player2 = newPlayer2
         , player3 = newPlayer3
         , player4 = newPlayer4
-    }
+      }
+    , sounds
+    )
 
 
 
 -- COLLISIONS ########################################################
 
 
-processCollisionsUntil : Time.Posix -> Game -> Game
-processCollisionsUntil endTime game =
+processCollisionsUntil : Time.Posix -> ( Game, List SoundEffect ) -> ( Game, List SoundEffect )
+processCollisionsUntil endTime ( game, sounds ) =
     allCollisions endTime game
         |> List.sortBy .time
         -- |> Debug.log "allCollisions"
-        |> List.foldl processCollision game
+        |> List.foldl processCollision ( game, sounds )
 
 
-processCollision : { time : Float, kind : Collision.Kind } -> Game -> Game
-processCollision { time, kind } game =
+processCollision : { time : Float, kind : Collision.Kind } -> ( Game, List SoundEffect ) -> ( Game, List SoundEffect )
+processCollision { time, kind } ( game, sounds ) =
     case kind of
         -- bullet - wall
         Collision.BulletWall id _ ->
-            { game | bullets = Dict.remove id game.bullets }
+            ( { game | bullets = Dict.remove id game.bullets }, sounds )
 
         -- bullet - ball
         Collision.BulletBall bulletId ballId ->
-            impactIdentifiedBulletOnBall time bulletId ballId game
+            ( impactIdentifiedBulletOnBall time bulletId ballId game
+            , sounds
+            )
 
         -- player - bullet
         Collision.PlayerBullet oneOfFour bulletId ->
-            impactIdentifiedBulletOnPlayer time bulletId oneOfFour game
+            ( impactIdentifiedBulletOnPlayer time bulletId oneOfFour game
+            , Sound.play Sound.Collision :: sounds
+            )
 
         -- ball - ball
         -- https://en.m.wikipedia.org/wiki/Elastic_collision
         Collision.BallBall id1 id2 ->
-            impactBallBall time id1 id2 game
+            ( impactBallBall time id1 id2 game
+            , sounds
+            )
 
         -- ball - wall
         Collision.BallWall ballId wall ->
-            impactBallWall time ballId wall game
+            impactBallWall time ballId wall ( game, sounds )
 
         -- bullet - bullet
         Collision.BulletBullet id1 id2 ->
-            impactBulletBullet id1 id2 game
+            ( impactBulletBullet id1 id2 game
+            , sounds
+            )
 
         -- player - ball
         Collision.PlayerBall oneOfFour ballId ->
-            impactBallPlayer time ballId oneOfFour game
+            ( impactBallPlayer time ballId oneOfFour game, sounds )
 
         _ ->
-            game
+            ( game, sounds )
 
 
 impactBallPlayer : Float -> Int -> OneOfFour -> Game -> Game
@@ -271,8 +282,8 @@ impactBulletBullet id1 id2 ({ bullets } as game) =
     { game | bullets = Dict.remove id1 bullets |> Dict.remove id2 }
 
 
-impactBallWall : Float -> Int -> Field.Wall -> Game -> Game
-impactBallWall time ballId wall ({ balls } as game) =
+impactBallWall : Float -> Int -> Field.Wall -> ( Game, List SoundEffect ) -> ( Game, List SoundEffect )
+impactBallWall time ballId wall ( { balls } as game, sounds ) =
     case ( Dict.get ballId balls.inGame, wall ) of
         ( Just ball, Field.Top ) ->
             let
@@ -288,7 +299,9 @@ impactBallWall time ballId wall ({ balls } as game) =
                 ballsInGame =
                     Dict.insert ballId newBall balls.inGame
             in
-            { game | balls = { balls | inGame = ballsInGame } }
+            ( { game | balls = { balls | inGame = ballsInGame } }
+            , sounds
+            )
 
         ( Just ball, Field.Bottom ) ->
             let
@@ -304,7 +317,9 @@ impactBallWall time ballId wall ({ balls } as game) =
                 ballsInGame =
                     Dict.insert ballId newBall balls.inGame
             in
-            { game | balls = { balls | inGame = ballsInGame } }
+            ( { game | balls = { balls | inGame = ballsInGame } }
+            , sounds
+            )
 
         ( Just ball, Field.Left ) ->
             let
@@ -314,7 +329,9 @@ impactBallWall time ballId wall ({ balls } as game) =
                         , incoming = ballId :: balls.incoming
                     }
             in
-            { game | balls = newBalls, score = Tuple.mapSecond ((+) 1) game.score }
+            ( { game | balls = newBalls, score = Tuple.mapSecond ((+) 1) game.score }
+            , Sound.play Sound.Goal :: sounds
+            )
 
         ( Just ball, Field.Right ) ->
             let
@@ -324,10 +341,12 @@ impactBallWall time ballId wall ({ balls } as game) =
                         , incoming = ballId :: balls.incoming
                     }
             in
-            { game | balls = newBalls, score = Tuple.mapFirst ((+) 1) game.score }
+            ( { game | balls = newBalls, score = Tuple.mapFirst ((+) 1) game.score }
+            , Sound.play Sound.Goal :: sounds
+            )
 
         _ ->
-            game
+            ( game, sounds )
 
 
 impactBallBall : Float -> Int -> Int -> Game -> Game
@@ -524,8 +543,8 @@ triple a b c =
 
 {-| Move all units until new frame time and update frame time.
 -}
-moveAllUntil : Time.Posix -> Game -> Game
-moveAllUntil newFrameTime game =
+moveAllUntil : Time.Posix -> ( Game, List SoundEffect ) -> ( Game, List SoundEffect )
+moveAllUntil newFrameTime ( game, sounds ) =
     let
         newPlayer1 =
             Player.moveUntil newFrameTime game.player1
@@ -552,7 +571,7 @@ moveAllUntil newFrameTime game =
         newBalls =
             moveBallsUntil newFrameTime game.balls
     in
-    { game
+    ( { game
         | frameTime = newFrameTime
         , player1 = newPlayer1
         , player2 = newPlayer2
@@ -560,7 +579,9 @@ moveAllUntil newFrameTime game =
         , player4 = newPlayer4
         , bullets = newBullets
         , balls = newBalls
-    }
+      }
+    , sounds
+    )
 
 
 
@@ -569,31 +590,39 @@ moveAllUntil newFrameTime game =
 
 {-| Spawn bullets.
 -}
-spawnAllBullets : Four Bool -> Game -> Game
-spawnAllBullets shotKeys game =
+spawnAllBullets : Four Bool -> ( Game, List SoundEffect ) -> ( Game, List SoundEffect )
+spawnAllBullets shotKeys ( game, sounds ) =
     let
-        ( newPlayer1, hasShot1 ) =
+        ( newPlayer1, hasShot1, soundEffect1 ) =
             Player.updateShot shotKeys.one game.player1
 
-        ( newPlayer2, hasShot2 ) =
+        ( newPlayer2, hasShot2, soundEffect2 ) =
             Player.updateShot shotKeys.two game.player2
 
-        ( newPlayer3, hasShot3 ) =
+        ( newPlayer3, hasShot3, soundEffect3 ) =
             Player.updateShot shotKeys.three game.player3
 
-        ( newPlayer4, hasShot4 ) =
+        ( newPlayer4, hasShot4, soundEffect4 ) =
             Player.updateShot shotKeys.four game.player4
     in
-    { game
+    ( { game
         | player1 = newPlayer1
         , player2 = newPlayer2
         , player3 = newPlayer3
         , player4 = newPlayer4
-    }
+      }
         |> updateBullets Un hasShot1 newPlayer1
         |> updateBullets Deux hasShot2 newPlayer2
         |> updateBullets Trois hasShot3 newPlayer3
         |> updateBullets Quatre hasShot4 newPlayer4
+    , List.concat
+        [ soundEffect1
+        , soundEffect2
+        , soundEffect3
+        , soundEffect4
+        , sounds
+        ]
+    )
 
 
 updateBullets : OneOfFour -> Player.HasShot -> Player -> Game -> Game
@@ -671,8 +700,8 @@ moveBallsUntil newFrameTime balls =
     { balls | inGame = Dict.map (\_ ball -> Ball.moveUntil newFrameTime ball) balls.inGame }
 
 
-changeGameBalls : Time.Posix -> Int -> Game -> Game
-changeGameBalls newFrameTime duration game =
+changeGameBalls : Time.Posix -> Int -> ( Game, List SoundEffect ) -> ( Game, List SoundEffect )
+changeGameBalls newFrameTime duration ( game, sounds ) =
     let
         newBalls =
             game.balls
@@ -681,7 +710,7 @@ changeGameBalls newFrameTime duration game =
                 |> checkStartBallCounter newFrameTime
                 |> checkSpawnBall newFrameTime
     in
-    { game | balls = newBalls }
+    ( { game | balls = newBalls }, sounds )
 
 
 {-| There should only be OutOfGoal balls at this time

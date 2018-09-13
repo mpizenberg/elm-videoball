@@ -15,6 +15,7 @@ module Physical.Player exposing
     , updateShot
     )
 
+import Data.Sound as Sound exposing (SoundEffect)
 import Time
 
 
@@ -217,21 +218,21 @@ type HasShot
     | ShotAfter Int
 
 
-updateShot : Bool -> Player -> ( Player, HasShot )
+updateShot : Bool -> Player -> ( Player, HasShot, List SoundEffect )
 updateShot spaceBarDown player =
     case ( player.stunned, spaceBarDown, player.shootPrep ) of
         ( Nothing, True, Nothing ) ->
-            ( { player | shootPrep = Just player.timeState }, NoShot )
+            ( { player | shootPrep = Just player.timeState }, NoShot, [] )
 
         ( Nothing, False, Just prepTime ) ->
             let
                 duration =
                     Time.posixToMillis player.timeState - Time.posixToMillis prepTime
             in
-            ( { player | shootPrep = Nothing }, ShotAfter duration )
+            ( { player | shootPrep = Nothing }, ShotAfter duration, [ Sound.play Sound.Bullet ] )
 
         _ ->
-            ( player, NoShot )
+            ( player, NoShot, [] )
 
 
 shotRecoil : Int -> Player -> Player

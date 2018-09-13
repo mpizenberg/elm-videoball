@@ -4,6 +4,7 @@ import Browser
 import Controller.Gamepad as Gamepad exposing (Gamepad)
 import Data.Game as Game exposing (Game)
 import Data.Helper exposing (Four)
+import Data.Sound as Sound exposing (Sound)
 import Html exposing (Html)
 import Html.Attributes
 import Physical.Player as Player
@@ -28,18 +29,18 @@ type alias Flags =
     }
 
 
-type alias Size =
-    { width : Float
-    , height : Float
-    }
-
-
 type alias Model =
     { size : Size
     , frameSize : Size
     , frameTime : Time.Posix
     , game : Game
     , playerControls : Four Player.Control
+    }
+
+
+type alias Size =
+    { width : Float
+    , height : Float
     }
 
 
@@ -96,14 +97,17 @@ update msg model =
 
                 newPlayerControls =
                     Gamepad.updatePlayerControls gamepads model.playerControls
+
+                ( game, soundEffects ) =
+                    Game.update newFrameTime duration newPlayerControls model.game
             in
             ( { model
                 | frameSize = model.size
                 , frameTime = newFrameTime
                 , playerControls = newPlayerControls
-                , game = Game.update newFrameTime duration newPlayerControls model.game
+                , game = game
               }
-            , Cmd.none
+            , Cmd.batch <| List.map (Sound.handle Ports.sounds) soundEffects
             )
 
 
