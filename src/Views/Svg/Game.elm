@@ -4,6 +4,7 @@ module Views.Svg.Game exposing
     )
 
 import Data.Game as Game exposing (Game)
+import Data.Helper exposing (timeDiff)
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes
@@ -87,11 +88,27 @@ viewField frameSize game =
                 |> Dict.values
                 |> List.map Views.Svg.Ball.view
                 |> Svg.g []
+
+        ballSpawnTimer =
+            case game.balls.timer of
+                Game.WaitingForFreeSpace ->
+                    Svg.g [] []
+
+                Game.FreeSince time ->
+                    let
+                        duration =
+                            timeDiff time game.frameTime
+
+                        spawnRatio =
+                            toFloat duration / toFloat Game.ballTimer
+                    in
+                    Views.Svg.Field.ballSpawnTimer spawnRatio
     in
     Views.Svg.Field.view
         [ Views.Svg.Field.background
         , Views.Svg.Field.leftGoal
         , Views.Svg.Field.rightGoal
+        , ballSpawnTimer
         , balls
         , bullets
         , players

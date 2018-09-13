@@ -1,12 +1,14 @@
 module Data.Game exposing
-    ( Balls
+    ( BallTimer(..)
+    , Balls
     , Game
     , allPlayers
+    , ballTimer
     , init
     , update
     )
 
-import Data.Helper exposing (Four, OneOfFour(..))
+import Data.Helper exposing (Four, OneOfFour(..), timeDiff)
 import Data.ListExtra exposing (reversePrepend)
 import Data.Vector as Vector
 import Dict exposing (Dict)
@@ -649,9 +651,4 @@ centerIsFree ballsInGame =
 
 ballTimer : Int
 ballTimer =
-    2000
-
-
-timeDiff : Time.Posix -> Time.Posix -> Int
-timeDiff t1 t2 =
-    Time.posixToMillis t2 - Time.posixToMillis t1
+    4000
