@@ -1,5 +1,6 @@
 module Views.Svg.Field exposing
     ( background
+    , ballSpawnTimer
     , leftGoal
     , rightGoal
     , view
@@ -80,3 +81,58 @@ stringFieldWidth =
 stringFieldHeight : String
 stringFieldHeight =
     String.fromFloat Field.height
+
+
+ballSpawnTimer : Float -> Svg msg
+ballSpawnTimer ratio =
+    let
+        ( centerX, centerY ) =
+            Field.center
+
+        startX =
+            centerX + Ball.size
+
+        startY =
+            centerY
+
+        endX =
+            centerX + Ball.size * cos (ratio * 2.0 * pi)
+
+        endY =
+            centerY + Ball.size * sin (ratio * 2.0 * pi)
+
+        rotationAngle =
+            (360.0 * ratio)
+                |> Debug.log "rotation angle"
+
+        ( largeArcFlag, sweepFlag ) =
+            if rotationAngle <= 180.0 then
+                ( "0", "1" )
+
+            else
+                ( "1", "1" )
+
+        stringPath =
+            String.join " "
+                [ "M"
+                , String.fromFloat centerX
+                , String.fromFloat centerY
+                , "L"
+                , String.fromFloat startX
+                , String.fromFloat startY
+                , "A"
+                , String.fromFloat Ball.size
+                , String.fromFloat Ball.size
+                , String.fromFloat rotationAngle
+                , largeArcFlag
+                , sweepFlag
+                , String.fromFloat endX
+                , String.fromFloat endY
+                ]
+    in
+    Svg.path
+        [ Svg.Attributes.d stringPath
+        , Svg.Attributes.fill Views.Colors.ball
+        , Svg.Attributes.opacity "0.5"
+        ]
+        []

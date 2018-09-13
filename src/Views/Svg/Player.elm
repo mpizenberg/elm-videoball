@@ -50,7 +50,7 @@ view color { pos, direction, shootPrep, stunned, timeState } =
         player =
             Svg.polygon
                 [ Svg.Attributes.points points
-                , Svg.Attributes.fill "transparent"
+                , Svg.Attributes.fill Views.Colors.fieldBackground
                 , Svg.Attributes.stroke color
                 , Svg.Attributes.strokeWidth "10"
                 ]
@@ -101,6 +101,7 @@ view color { pos, direction, shootPrep, stunned, timeState } =
                 , Svg.Attributes.r shootDiskSize
                 , Svg.Attributes.fill Views.Colors.shootDisk
                 , Svg.Attributes.opacity shootOpacity
+                , Svg.Attributes.stroke Views.Colors.shootDiskContour
                 ]
                 []
     in

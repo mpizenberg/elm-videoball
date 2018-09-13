@@ -5,6 +5,7 @@ module Processing.Collision exposing
     , bulletBallAll
     , bulletBulletAll
     , bulletWallAll
+    , playerBallAll
     , playerBulletAll
     , playerPlayerAll
     )
@@ -129,8 +130,65 @@ collidePlayerWithBullet duration ( oneOfFour, player ) ( bulletId, bullet ) =
 
 playerBallAll : Int -> Player -> Player -> Player -> Player -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
 playerBallAll duration p1 p2 p3 p4 balls =
-    -- Debug.todo "playerBallAll"
-    []
+    collidePlayerWithAllBalls duration ( Un, p1 ) balls
+        |> reversePrepend (collidePlayerWithAllBalls duration ( Deux, p2 ) balls)
+        |> reversePrepend (collidePlayerWithAllBalls duration ( Trois, p3 ) balls)
+        |> reversePrepend (collidePlayerWithAllBalls duration ( Quatre, p4 ) balls)
+
+
+collidePlayerWithAllBalls : Int -> ( OneOfFour, Player ) -> List ( Int, Ball ) -> List { time : Float, kind : Kind }
+collidePlayerWithAllBalls duration identifiedPlayer balls =
+    List.filterMap (collidePlayerWithBall duration identifiedPlayer) balls
+
+
+collidePlayerWithBall : Int -> ( OneOfFour, Player ) -> ( Int, Ball ) -> Maybe { time : Float, kind : Kind }
+collidePlayerWithBall duration ( oneOfFour, player ) ( ballId, ball ) =
+    let
+        a =
+            Vector.fromTo player.speed ball.speed
+
+        b =
+            Vector.fromTo player.pos ball.pos
+
+        d =
+            Player.size + Ball.size
+
+        -- for t in [0,duration], solve | a * t + b | <= d
+        aa =
+            Vector.norm2 a
+
+        bb =
+            Vector.norm2 b
+
+        ab =
+            Vector.dot a b
+
+        dd =
+            d * d
+
+        discriminant =
+            ab * ab - aa * (bb - dd)
+    in
+    if discriminant < 0 then
+        Nothing
+
+    else
+        let
+            sqDiscriminant =
+                sqrt discriminant
+
+            t1 =
+                (-ab - sqDiscriminant) / aa
+
+            t2 =
+                (-ab + sqDiscriminant) / aa
+        in
+        -- check that [t1,t2] intersects [0,duration]
+        if t2 >= 0 && t1 <= toFloat duration then
+            Just { time = max 0 t1, kind = PlayerBall oneOfFour ballId }
+
+        else
+            Nothing
 
 
 

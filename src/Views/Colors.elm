@@ -9,6 +9,7 @@ module Views.Colors exposing
     , playerB
     , playerContour
     , shootDisk
+    , shootDiskContour
     , stunDisk
     , textDark
     , textLight
@@ -83,6 +84,10 @@ bulletB =
 
 shootDisk =
     white
+
+
+shootDiskContour =
+    gray
 
 
 stunDisk =
