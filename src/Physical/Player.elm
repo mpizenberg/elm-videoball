@@ -75,7 +75,7 @@ init frameTime direction pos =
 
 stun : Player -> Player
 stun player =
-    { player | stunned = Just player.timeState }
+    { player | stunned = Just player.timeState, shootPrep = Nothing }
 
 
 {-| Update thrusting, direction, speed and stunned such that
