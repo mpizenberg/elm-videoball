@@ -72,6 +72,22 @@ allPlayers { player1, player2, player3, player4 } =
     [ player1, player2, player3, player4 ]
 
 
+playerNumber : OneOfFour -> Game -> Player
+playerNumber oneOfFour game =
+    case oneOfFour of
+        Un ->
+            game.player1
+
+        Deux ->
+            game.player2
+
+        Trois ->
+            game.player3
+
+        Quatre ->
+            game.player4
+
+
 update : Time.Posix -> Int -> Four Player.Control -> Game -> Game
 update newFrameTime duration playerControls game =
     let
@@ -190,8 +206,64 @@ processCollision { time, kind } game =
 
 
 impactBallPlayer : Float -> Int -> OneOfFour -> Game -> Game
-impactBallPlayer time ballId oneOfFour game =
-    game
+impactBallPlayer time ballId oneOfFour ({ balls } as game) =
+    case Dict.get ballId balls.inGame of
+        Just ball ->
+            let
+                b =
+                    Ball.moveDuring time ball
+
+                player =
+                    playerNumber oneOfFour game
+
+                speedDiff =
+                    Vector.diff b.speed player.speed
+
+                centerDiff =
+                    Vector.diff b.pos player.pos
+
+                squareDistance =
+                    0.000001 + Vector.norm2 centerDiff
+
+                newBallSpeed =
+                    centerDiff
+                        |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                        |> Vector.diff b.speed
+                        |> Vector.times 0.2
+
+                newPlayerSpeed =
+                    centerDiff
+                        |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                        |> Vector.add player.speed
+
+                newBall =
+                    { b | speed = newBallSpeed }
+
+                ballsInGame =
+                    Dict.insert ballId newBall balls.inGame
+
+                newBalls =
+                    { balls | inGame = ballsInGame }
+
+                newPlayer =
+                    { player | speed = newPlayerSpeed }
+                        |> Player.stun
+            in
+            case oneOfFour of
+                Un ->
+                    { game | balls = newBalls, player1 = newPlayer }
+
+                Deux ->
+                    { game | balls = newBalls, player2 = newPlayer }
+
+                Trois ->
+                    { game | balls = newBalls, player3 = newPlayer }
+
+                Quatre ->
+                    { game | balls = newBalls, player4 = newPlayer }
+
+        _ ->
+            game
 
 
 impactBulletBullet : Int -> Int -> Game -> Game

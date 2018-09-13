@@ -102,8 +102,7 @@ ballSpawnTimer ratio =
             centerY + Ball.size * sin (ratio * 2.0 * pi)
 
         rotationAngle =
-            (360.0 * ratio)
-                |> Debug.log "rotation angle"
+            360.0 * ratio
 
         ( largeArcFlag, sweepFlag ) =
             if rotationAngle <= 180.0 then
