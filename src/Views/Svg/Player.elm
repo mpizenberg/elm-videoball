@@ -50,7 +50,7 @@ view color { pos, direction, shootPrep, stunned, timeState } =
         player =
             Svg.polygon
                 [ Svg.Attributes.points points
-                , Svg.Attributes.fill "transparent"
+                , Svg.Attributes.fill Views.Colors.fieldBackground
                 , Svg.Attributes.stroke color
                 , Svg.Attributes.strokeWidth "10"
                 ]
