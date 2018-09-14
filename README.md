@@ -7,6 +7,8 @@ https://mpizenberg.github.io/elm-videoball/.
 > This is not affiliated to the official game.
 > If you like this game, you will very much like [the original one][videoball].
 
+![screenshot][screenshot]
+
 This game is done using the [elm language][elm].
 We made it for the fun and to show that it is quite easy to make games in elm.
 It uses [elm-gamepad][elm-gamepad] to handle game controllers through ports,
@@ -21,7 +23,8 @@ Visuals are under the `Views/Svg/` directory.
 
 Have fun playing it!
 
+[screenshot]: https://mpizenberg.github.io/resources/elm-videoball/elm-videoball-redesign.png
 [videoball]: http://videoball.net/
-[elm]: http://elm-lang.org/
+[elm]: https://elm-lang.org/
 [elm-gamepad]: https://github.com/xarvh/elm-gamepad
 [howler]: https://howlerjs.com/
