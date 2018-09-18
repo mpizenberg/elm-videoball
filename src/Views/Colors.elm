@@ -1,5 +1,6 @@
 module Views.Colors exposing
     ( ball
+    , ballSmash
     , bulletA
     , bulletB
     , fieldBackground
@@ -72,6 +73,10 @@ netB =
 
 ball =
     gray
+
+
+ballSmash =
+    black
 
 
 bulletA =

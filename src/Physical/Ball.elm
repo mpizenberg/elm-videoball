@@ -8,6 +8,7 @@ module Physical.Ball exposing
     , squareDistanceFrom
     )
 
+import Data.Helper as Helper
 import Physical.Field as Field
 import Time
 
@@ -20,7 +21,7 @@ size =
 type alias Ball =
     { pos : ( Float, Float )
     , speed : ( Float, Float )
-    , superspeed : Maybe Time.Posix
+    , smash : Maybe Time.Posix
     , timeState : Time.Posix
     }
 
@@ -29,7 +30,7 @@ init : Time.Posix -> Ball
 init frameTime =
     { pos = Field.center
     , speed = ( 0, 0 )
-    , superspeed = Nothing
+    , smash = Nothing
     , timeState = frameTime
     }
 
@@ -80,8 +81,20 @@ moveUntil time ball =
             ( Tuple.first ball.pos + toFloat duration * Tuple.first ball.speed
             , Tuple.second ball.pos + toFloat duration * Tuple.second ball.speed
             )
+
+        newSmash =
+            case ball.smash of
+                Just smashTime ->
+                    if Helper.timeDiff smashTime time > 1000 then
+                        Nothing
+
+                    else
+                        ball.smash
+
+                _ ->
+                    ball.smash
     in
-    { ball | pos = newPos, timeState = time }
+    { ball | pos = newPos, timeState = time, smash = newSmash }
         |> bounceOnWalls
 
 
