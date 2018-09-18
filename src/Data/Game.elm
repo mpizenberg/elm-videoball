@@ -377,21 +377,55 @@ impactBallBall time id1 id2 ({ balls } as game) =
                 squareDistance =
                     0.000001 + Vector.norm2 centerDiff
 
+                smash1 =
+                    Maybe.map (always game.frameTime) b2.smash
+
+                smash2 =
+                    Maybe.map (always game.frameTime) b1.smash
+
                 newSpeed1 =
-                    centerDiff
-                        |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
-                        |> Vector.diff b1.speed
+                    case ( b1.smash, smash1 ) of
+                        ( Nothing, Nothing ) ->
+                            centerDiff
+                                |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                                |> Vector.diff b1.speed
+
+                        ( _, Just _ ) ->
+                            centerDiff
+                                |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                                |> Vector.diff b1.speed
+                                |> Vector.setNorm 3.0
+
+                        ( _, Nothing ) ->
+                            centerDiff
+                                |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                                |> Vector.diff b1.speed
+                                |> Vector.times 0.5
 
                 newSpeed2 =
-                    centerDiff
-                        |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
-                        |> Vector.add b2.speed
+                    case ( b2.smash, smash2 ) of
+                        ( Nothing, Nothing ) ->
+                            centerDiff
+                                |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                                |> Vector.add b2.speed
+
+                        ( _, Just _ ) ->
+                            centerDiff
+                                |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                                |> Vector.add b2.speed
+                                |> Vector.setNorm 3.0
+
+                        ( _, Nothing ) ->
+                            centerDiff
+                                |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                                |> Vector.add b2.speed
+                                |> Vector.times 0.5
 
                 newBall1 =
-                    { b1 | speed = newSpeed1 }
+                    { b1 | speed = newSpeed1, smash = smash1 }
 
                 newBall2 =
-                    { b2 | speed = newSpeed2 }
+                    { b2 | speed = newSpeed2, smash = smash2 }
 
                 ballsInGame =
                     Dict.insert id1 newBall1 balls.inGame
