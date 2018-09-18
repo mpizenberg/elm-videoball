@@ -1,4 +1,4 @@
-module Data.Vector exposing (add, diff, dot, fromTo, norm2, times)
+module Data.Vector exposing (add, diff, dot, fromTo, norm2, setNorm, times)
 
 
 add : ( Float, Float ) -> ( Float, Float ) -> ( Float, Float )
@@ -29,3 +29,8 @@ norm2 ( x, y ) =
 dot : ( Float, Float ) -> ( Float, Float ) -> Float
 dot ( x1, y1 ) ( x2, y2 ) =
     x1 * x2 + y1 * y2
+
+
+setNorm : Float -> ( Float, Float ) -> ( Float, Float )
+setNorm value vector =
+    times (value / sqrt (norm2 vector)) vector
