@@ -586,11 +586,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ap.V === region.aB.V)
+	if (region.aq.W === region.aC.W)
 	{
-		return 'on line ' + region.ap.V;
+		return 'on line ' + region.aq.W;
 	}
-	return 'on lines ' + region.ap.V + ' through ' + region.aB.V;
+	return 'on lines ' + region.aq.W + ' through ' + region.aC.W;
 }
 
 
@@ -2680,9 +2680,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		w: func(record.w),
-		ar: record.ar,
-		an: record.an
+		y: func(record.y),
+		as: record.as,
+		ao: record.ao
 	}
 });
 
@@ -2950,11 +2950,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.w;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ar;
+		var message = !tag ? value : tag < 3 ? value.a : value.y;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.as;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.an) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ao) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3940,7 +3940,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.bu,
 		impl.bp,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.X && impl.X(sendToApp)
+			var divertHrefToApp = impl.Y && impl.Y(sendToApp)
 			var view = impl.bw;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4010,7 +4010,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		X: function(sendToApp)
+		Y: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4026,9 +4026,9 @@ function _Browser_application(impl)
 					var next = elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aR === next.aR
-							&& curr.aF === next.aF
-							&& curr.aO.a === next.aO.a
+							&& curr.aS === next.aS
+							&& curr.aG === next.aG
+							&& curr.aP.a === next.aP.a
 						)
 							? elm$browser$Browser$Internal(next)
 							: elm$browser$Browser$External(href)
@@ -4108,17 +4108,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { ba: 'hidden', S: 'visibilitychange' }
+		? { ba: 'hidden', U: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { ba: 'mozHidden', S: 'mozvisibilitychange' }
+		? { ba: 'mozHidden', U: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { ba: 'msHidden', S: 'msvisibilitychange' }
+		? { ba: 'msHidden', U: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { ba: 'webkitHidden', S: 'webkitvisibilitychange' }
-		: { ba: 'hidden', S: 'visibilitychange' };
+		? { ba: 'webkitHidden', U: 'webkitvisibilitychange' }
+		: { ba: 'hidden', U: 'visibilitychange' };
 }
 
 
@@ -4199,12 +4199,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aV: _Browser_getScene(),
+		aW: _Browser_getScene(),
 		a0: {
-			av: _Browser_window.pageXOffset,
-			aw: _Browser_window.pageYOffset,
+			aw: _Browser_window.pageXOffset,
+			ax: _Browser_window.pageYOffset,
 			a1: _Browser_doc.documentElement.clientWidth,
-			aE: _Browser_doc.documentElement.clientHeight
+			aF: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4215,7 +4215,7 @@ function _Browser_getScene()
 	var elem = _Browser_doc.documentElement;
 	return {
 		a1: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aE: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aF: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4238,15 +4238,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aV: {
+			aW: {
 				a1: node.scrollWidth,
-				aE: node.scrollHeight
+				aF: node.scrollHeight
 			},
 			a0: {
-				av: node.scrollLeft,
-				aw: node.scrollTop,
+				aw: node.scrollLeft,
+				ax: node.scrollTop,
 				a1: node.clientWidth,
-				aE: node.clientHeight
+				aF: node.clientHeight
 			}
 		};
 	});
@@ -4276,18 +4276,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aV: _Browser_getScene(),
+			aW: _Browser_getScene(),
 			a0: {
-				av: x,
-				aw: y,
+				aw: x,
+				ax: y,
 				a1: _Browser_doc.documentElement.clientWidth,
-				aE: _Browser_doc.documentElement.clientHeight
+				aF: _Browser_doc.documentElement.clientHeight
 			},
 			a6: {
-				av: x + rect.left,
-				aw: y + rect.top,
+				aw: x + rect.left,
+				ax: y + rect.top,
 				a1: rect.width,
-				aE: rect.height
+				aF: rect.height
 			}
 		};
 	});
@@ -4324,7 +4324,7 @@ function _Browser_load(url)
 }
 var author$project$Data$Game$Balls = F3(
 	function (inGame, incoming, timer) {
-		return {b: inGame, C: incoming, ah: timer};
+		return {b: inGame, E: incoming, ai: timer};
 	});
 var author$project$Data$Game$FreeSince = function (a) {
 	return {$: 1, a: a};
@@ -4422,13 +4422,13 @@ var elm$core$Maybe$Nothing = {$: 1};
 var author$project$Physical$Player$init = F3(
 	function (frameTime, direction, pos) {
 		return {
-			p: direction,
-			W: pos,
-			O: elm$core$Maybe$Nothing,
-			d: _Utils_Tuple2(0, 0),
+			m: direction,
+			X: pos,
+			Q: elm$core$Maybe$Nothing,
+			c: _Utils_Tuple2(0, 0),
 			bn: elm$core$Maybe$Nothing,
 			br: false,
-			_: frameTime
+			aa: frameTime
 		};
 	});
 var elm$core$Basics$pi = _Basics_pi;
@@ -4436,21 +4436,21 @@ var elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var author$project$Data$Game$init = function (startTime) {
 	return {
-		c: A3(
+		d: A3(
 			author$project$Data$Game$Balls,
 			elm$core$Dict$empty,
 			_List_fromArray(
 				[0, 1, 2]),
 			author$project$Data$Game$FreeSince(startTime)),
 		a: elm$core$Dict$empty,
-		T: startTime,
+		x: startTime,
 		i: A3(author$project$Physical$Player$init, startTime, 0, author$project$Physical$Field$placePlayer1),
 		j: A3(author$project$Physical$Player$init, startTime, 0, author$project$Physical$Field$placePlayer2),
 		k: A3(author$project$Physical$Player$init, startTime, elm$core$Basics$pi, author$project$Physical$Field$placePlayer3),
 		l: A3(author$project$Physical$Player$init, startTime, elm$core$Basics$pi, author$project$Physical$Field$placePlayer4),
-		N: _Utils_Tuple2(0, 0),
-		aX: startTime,
-		y: 0
+		P: _Utils_Tuple2(0, 0),
+		aY: startTime,
+		A: 0
 	};
 };
 var author$project$Physical$Player$Control = F2(
@@ -4858,21 +4858,21 @@ var elm$time$Time$Posix = elm$core$Basics$identity;
 var elm$time$Time$millisToPosix = elm$core$Basics$identity;
 var author$project$Main$init = function (_n0) {
 	var time = _n0.a$;
-	var size = _n0.aW;
+	var size = _n0.aX;
 	var gamepadTime = 0;
 	return _Utils_Tuple2(
 		{
-			ae: size,
-			T: elm$time$Time$millisToPosix(gamepadTime),
-			U: author$project$Data$Game$init(
+			af: size,
+			x: elm$time$Time$millisToPosix(gamepadTime),
+			V: author$project$Data$Game$init(
 				elm$time$Time$millisToPosix(gamepadTime)),
-			ag: {
+			ah: {
 				a9: A2(author$project$Physical$Player$Control, elm$core$Maybe$Nothing, false),
 				bk: A2(author$project$Physical$Player$Control, elm$core$Maybe$Nothing, false),
 				bq: A2(author$project$Physical$Player$Control, elm$core$Maybe$Nothing, false),
 				bt: A2(author$project$Physical$Player$Control, elm$core$Maybe$Nothing, false)
 			},
-			aW: size
+			aX: size
 		},
 		elm$core$Platform$Cmd$none);
 };
@@ -4913,7 +4913,7 @@ var author$project$Ports$gamepad = _Platform_incomingPort(
 								elm$json$Json$Decode$andThen,
 								function (gamepads) {
 									return elm$json$Json$Decode$succeed(
-										{af: gamepads, au: timestamp});
+										{ag: gamepads, av: timestamp});
 								},
 								A2(
 									elm$json$Json$Decode$field,
@@ -4935,7 +4935,7 @@ var author$project$Ports$gamepad = _Platform_incomingPort(
 																			elm$json$Json$Decode$andThen,
 																			function (axes) {
 																				return elm$json$Json$Decode$succeed(
-																					{ai: axes, ak: buttons, J: id, o: index, aH: mapping});
+																					{aj: axes, al: buttons, L: id, p: index, aI: mapping});
 																			},
 																			A2(
 																				elm$json$Json$Decode$field,
@@ -4977,7 +4977,7 @@ var author$project$Ports$gamepad = _Platform_incomingPort(
 						elm$json$Json$Decode$andThen,
 						function (gamepads) {
 							return elm$json$Json$Decode$succeed(
-								{af: gamepads, au: timestamp});
+								{ag: gamepads, av: timestamp});
 						},
 						A2(
 							elm$json$Json$Decode$field,
@@ -4999,7 +4999,7 @@ var author$project$Ports$gamepad = _Platform_incomingPort(
 																	elm$json$Json$Decode$andThen,
 																	function (axes) {
 																		return elm$json$Json$Decode$succeed(
-																			{ai: axes, ak: buttons, J: id, o: index, aH: mapping});
+																			{aj: axes, al: buttons, L: id, p: index, aI: mapping});
 																	},
 																	A2(
 																		elm$json$Json$Decode$field,
@@ -5039,7 +5039,7 @@ var author$project$Ports$resizes = _Platform_incomingPort(
 				elm$json$Json$Decode$andThen,
 				function (height) {
 					return elm$json$Json$Decode$succeed(
-						{aE: height, a1: width});
+						{aF: height, a1: width});
 				},
 				A2(elm$json$Json$Decode$field, 'height', elm$json$Json$Decode$float));
 		},
@@ -5057,11 +5057,11 @@ var author$project$Gamepad$animationFrameTimestamp = function (_n0) {
 	var currentFrame = _n0.a;
 	var previousFrame = _n0.b;
 	return elm$time$Time$millisToPosix(
-		elm$core$Basics$floor(currentFrame.au));
+		elm$core$Basics$floor(currentFrame.av));
 };
 var author$project$Controller$Gamepad$animationFrameTimestamp = author$project$Gamepad$animationFrameTimestamp;
 var author$project$Gamepad$UserMappings = elm$core$Basics$identity;
-var author$project$Gamepad$emptyUserMappings = {H: elm$core$Dict$empty, A: elm$core$Dict$empty};
+var author$project$Gamepad$emptyUserMappings = {J: elm$core$Dict$empty, C: elm$core$Dict$empty};
 var author$project$Gamepad$Gamepad = F3(
 	function (a, b, c) {
 		return {$: 0, a: a, b: b, c: c};
@@ -5476,13 +5476,13 @@ var author$project$Gamepad$getGamepadMapping = F2(
 		var database = _n0;
 		var _n1 = A2(
 			elm$core$Dict$get,
-			_Utils_Tuple2(frame.o, frame.J),
-			database.A);
+			_Utils_Tuple2(frame.p, frame.L),
+			database.C);
 		if (!_n1.$) {
 			var mapping = _n1.a;
 			return elm$core$Maybe$Just(mapping);
 		} else {
-			return ((frame.aH === 'standard') || (frame.aH === '')) ? elm$core$Maybe$Just(author$project$Gamepad$standardGamepadMapping) : A2(elm$core$Dict$get, frame.J, database.H);
+			return ((frame.aI === 'standard') || (frame.aI === '')) ? elm$core$Maybe$Just(author$project$Gamepad$standardGamepadMapping) : A2(elm$core$Dict$get, frame.L, database.J);
 		}
 	});
 var elm$core$List$maybeCons = F3(
@@ -5553,12 +5553,12 @@ var author$project$Gamepad$getGamepads = F2(
 				A2(
 					elm_community$list_extra$List$Extra$find,
 					function (prev) {
-						return _Utils_eq(prev.o, currentGamepadFrame.o);
+						return _Utils_eq(prev.p, currentGamepadFrame.p);
 					},
-					previousBlobFrame.af),
+					previousBlobFrame.ag),
 				A2(author$project$Gamepad$getGamepadMapping, userMappings, currentGamepadFrame));
 		};
-		return A2(elm$core$List$filterMap, getGamepad, currentBlobFrame.af);
+		return A2(elm$core$List$filterMap, getGamepad, currentBlobFrame.ag);
 	});
 var author$project$Controller$Gamepad$getGamepads = author$project$Gamepad$getGamepads(author$project$Gamepad$emptyUserMappings);
 var author$project$Controller$Gamepad$deadZone = 1.0e-2;
@@ -5658,7 +5658,7 @@ var author$project$Gamepad$getAsBool = F3(
 						A2(
 							elm$core$Maybe$withDefault,
 							0,
-							A2(elm$core$Array$get, index, frame.ai))));
+							A2(elm$core$Array$get, index, frame.aj))));
 			} else {
 				var _n3 = _n0.a;
 				var isReverse = _n3.a;
@@ -5670,7 +5670,7 @@ var author$project$Gamepad$getAsBool = F3(
 					A2(
 						elm$core$Maybe$map,
 						elm$core$Tuple$first,
-						A2(elm$core$Array$get, index, frame.ak)));
+						A2(elm$core$Array$get, index, frame.al)));
 			}
 		}
 	});
@@ -5727,7 +5727,7 @@ var author$project$Gamepad$getAsFloat = F3(
 					A2(
 						elm$core$Maybe$withDefault,
 						0,
-						A2(elm$core$Array$get, index, frame.ai)));
+						A2(elm$core$Array$get, index, frame.aj)));
 			} else {
 				var _n3 = _n0.a;
 				var isReverse = _n3.a;
@@ -5739,7 +5739,7 @@ var author$project$Gamepad$getAsFloat = F3(
 					A2(
 						elm$core$Maybe$map,
 						elm$core$Tuple$second,
-						A2(elm$core$Array$get, index, frame.ak)));
+						A2(elm$core$Array$get, index, frame.al)));
 			}
 		}
 	});
@@ -5766,15 +5766,15 @@ var author$project$Gamepad$value = F2(
 	});
 var author$project$Gamepad$leftStickPosition = function (pad) {
 	return {
-		av: A2(author$project$Gamepad$value, pad, 0),
-		aw: A2(author$project$Gamepad$value, pad, 1)
+		aw: A2(author$project$Gamepad$value, pad, 0),
+		ax: A2(author$project$Gamepad$value, pad, 1)
 	};
 };
 var elm$core$Basics$atan2 = _Basics_atan2;
 var author$project$Controller$Gamepad$toPlayerControl = function (gamepad) {
 	var stick = author$project$Gamepad$leftStickPosition(gamepad);
-	var thrusting = (_Utils_cmp((stick.av * stick.av) + (stick.aw * stick.aw), author$project$Controller$Gamepad$deadZone) < 0) ? elm$core$Maybe$Nothing : elm$core$Maybe$Just(
-		A2(elm$core$Basics$atan2, -stick.aw, stick.av));
+	var thrusting = (_Utils_cmp((stick.aw * stick.aw) + (stick.ax * stick.ax), author$project$Controller$Gamepad$deadZone) < 0) ? elm$core$Maybe$Nothing : elm$core$Maybe$Just(
+		A2(elm$core$Basics$atan2, -stick.ax, stick.aw));
 	return {
 		bb: A2(author$project$Gamepad$isPressed, gamepad, 0),
 		br: thrusting
@@ -5784,7 +5784,7 @@ var author$project$Gamepad$getIndex = function (_n0) {
 	var mapping = _n0.a;
 	var currentFrame = _n0.b;
 	var previousFrame = _n0.c;
-	return currentFrame.o;
+	return currentFrame.p;
 };
 var author$project$Controller$Gamepad$toPlayerControlAcc = F2(
 	function (gamepad, controls) {
@@ -5835,17 +5835,17 @@ var author$project$Data$Helper$timeDiff = F2(
 var author$project$Physical$Field$center = _Utils_Tuple2(author$project$Physical$Field$width / 2, author$project$Physical$Field$height / 2);
 var author$project$Physical$Ball$init = function (frameTime) {
 	return {
-		W: author$project$Physical$Field$center,
-		d: _Utils_Tuple2(0, 0),
-		aZ: elm$core$Maybe$Nothing,
-		_: frameTime
+		X: author$project$Physical$Field$center,
+		u: elm$core$Maybe$Nothing,
+		c: _Utils_Tuple2(0, 0),
+		aa: frameTime
 	};
 };
 var author$project$Data$Game$checkSpawnBall = F2(
 	function (frameTime, balls) {
 		var inGame = balls.b;
-		var incoming = balls.C;
-		var timer = balls.ah;
+		var incoming = balls.E;
+		var timer = balls.ai;
 		var _n0 = _Utils_Tuple2(incoming, timer);
 		if (_n0.a.b && (_n0.b.$ === 1)) {
 			var _n1 = _n0.a;
@@ -5872,7 +5872,7 @@ var author$project$Physical$Ball$squareDistanceFrom = F2(
 	function (_n0, _n1) {
 		var x = _n0.a;
 		var y = _n0.b;
-		var pos = _n1.W;
+		var pos = _n1.X;
 		var dy = pos.b - y;
 		var dx = pos.a - x;
 		return (dx * dx) + (dy * dy);
@@ -5941,21 +5941,21 @@ var elm$core$List$isEmpty = function (xs) {
 var author$project$Data$Game$checkStartBallCounter = F2(
 	function (frameTime, balls) {
 		var inGame = balls.b;
-		var incoming = balls.C;
-		var timer = balls.ah;
+		var incoming = balls.E;
+		var timer = balls.ai;
 		return (_Utils_eq(timer, author$project$Data$Game$WaitingForFreeSpace) && ((!elm$core$List$isEmpty(incoming)) && author$project$Data$Game$centerIsFree(inGame))) ? _Utils_update(
 			balls,
 			{
-				ah: author$project$Data$Game$FreeSince(frameTime)
+				ai: author$project$Data$Game$FreeSince(frameTime)
 			}) : balls;
 	});
 var author$project$Physical$Ball$prepareMovement = F2(
 	function (duration, ball) {
 		var viscosityCoef = A2(elm$core$Basics$max, 0, 1 - (1.5e-3 * duration));
-		var newSpeed = _Utils_Tuple2(viscosityCoef * ball.d.a, viscosityCoef * ball.d.b);
+		var newSpeed = _Utils_Tuple2(viscosityCoef * ball.c.a, viscosityCoef * ball.c.b);
 		return _Utils_update(
 			ball,
-			{d: newSpeed});
+			{c: newSpeed});
 	});
 var elm$core$Dict$map = F2(
 	function (func, dict) {
@@ -6000,11 +6000,11 @@ var author$project$Data$Game$changeGameBalls = F3(
 			A2(
 				author$project$Data$Game$checkStartBallCounter,
 				newFrameTime,
-				A2(author$project$Data$Game$prepareBallsMovements, duration, game.c)));
+				A2(author$project$Data$Game$prepareBallsMovements, duration, game.d)));
 		return _Utils_Tuple2(
 			_Utils_update(
 				game,
-				{c: newBalls}),
+				{d: newBalls}),
 			sounds);
 	});
 var author$project$Data$Game$isNothing = function (maybe) {
@@ -6020,10 +6020,10 @@ var elm$core$Basics$min = F2(
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
 var author$project$Physical$Ball$bounceOnWalls = function (ball) {
-	var _n0 = ball.W;
+	var _n0 = ball.X;
 	var x = _n0.a;
 	var y = _n0.b;
-	var _n1 = ball.d;
+	var _n1 = ball.c;
 	var vX = _n1.a;
 	var vY = _n1.b;
 	var _n2 = function () {
@@ -6047,18 +6047,27 @@ var author$project$Physical$Ball$bounceOnWalls = function (ball) {
 	return _Utils_update(
 		ball,
 		{
-			W: _Utils_Tuple2(x, newY),
-			d: _Utils_Tuple2(vX, newVY)
+			X: _Utils_Tuple2(x, newY),
+			c: _Utils_Tuple2(vX, newVY)
 		});
 };
 var author$project$Physical$Ball$moveUntil = F2(
 	function (time, ball) {
-		var duration = elm$time$Time$posixToMillis(time) - elm$time$Time$posixToMillis(ball._);
-		var newPos = _Utils_Tuple2(ball.W.a + (duration * ball.d.a), ball.W.b + (duration * ball.d.b));
+		var newSmash = function () {
+			var _n0 = ball.u;
+			if (!_n0.$) {
+				var smashTime = _n0.a;
+				return (A2(author$project$Data$Helper$timeDiff, smashTime, time) > 1000) ? elm$core$Maybe$Nothing : ball.u;
+			} else {
+				return ball.u;
+			}
+		}();
+		var duration = elm$time$Time$posixToMillis(time) - elm$time$Time$posixToMillis(ball.aa);
+		var newPos = _Utils_Tuple2(ball.X.a + (duration * ball.c.a), ball.X.b + (duration * ball.c.b));
 		return author$project$Physical$Ball$bounceOnWalls(
 			_Utils_update(
 				ball,
-				{W: newPos, _: time}));
+				{X: newPos, u: newSmash, aa: time}));
 	});
 var author$project$Data$Game$moveBallsUntil = F2(
 	function (newFrameTime, balls) {
@@ -6080,19 +6089,19 @@ var elm$core$Basics$cos = _Basics_cos;
 var elm$core$Basics$sin = _Basics_sin;
 var author$project$Physical$Bullet$moveAtSpeed = F3(
 	function (speed, duration, bullet) {
-		var pos = bullet.W;
-		var direction = bullet.p;
+		var pos = bullet.X;
+		var direction = bullet.m;
 		var newPos = _Utils_Tuple2(
 			pos.a + ((speed * duration) * elm$core$Basics$cos(direction)),
 			pos.b + ((speed * duration) * elm$core$Basics$sin(direction)));
 		return _Utils_update(
 			bullet,
-			{W: newPos});
+			{X: newPos});
 	});
 var author$project$Physical$Bullet$smallSpeed = 1.4;
 var author$project$Physical$Bullet$move = F2(
 	function (duration, bullet) {
-		var _n0 = bullet.aW;
+		var _n0 = bullet.aX;
 		switch (_n0) {
 			case 0:
 				return A3(author$project$Physical$Bullet$moveAtSpeed, author$project$Physical$Bullet$smallSpeed, duration, bullet);
@@ -6109,10 +6118,10 @@ var author$project$Physical$Player$checkWallObstacle = F5(
 		var rightLimit = right - author$project$Physical$Player$size;
 		var leftLimit = left + author$project$Physical$Player$size;
 		var bottomLimit = bottom - author$project$Physical$Player$size;
-		var _n0 = player.W;
+		var _n0 = player.X;
 		var x = _n0.a;
 		var y = _n0.b;
-		var _n1 = player.d;
+		var _n1 = player.c;
 		var vX = _n1.a;
 		var vY = _n1.b;
 		var _n2 = (_Utils_cmp(y, topLimit) < 0) ? _Utils_Tuple2(topLimit + (0.5 * (topLimit - y)), (-0.5) * vY) : ((_Utils_cmp(y, bottomLimit) > 0) ? _Utils_Tuple2(bottomLimit - (0.5 * (y - bottomLimit)), (-0.5) * vY) : _Utils_Tuple2(y, vY));
@@ -6124,20 +6133,20 @@ var author$project$Physical$Player$checkWallObstacle = F5(
 		return _Utils_update(
 			player,
 			{
-				W: _Utils_Tuple2(newX, newY),
-				d: _Utils_Tuple2(newVX, newVY)
+				X: _Utils_Tuple2(newX, newY),
+				c: _Utils_Tuple2(newVX, newVY)
 			});
 	});
 var author$project$Physical$Player$moveUntil = F2(
 	function (time, player) {
-		var deltaTime = elm$time$Time$posixToMillis(time) - elm$time$Time$posixToMillis(player._);
-		var _n0 = player.d;
+		var deltaTime = elm$time$Time$posixToMillis(time) - elm$time$Time$posixToMillis(player.aa);
+		var _n0 = player.c;
 		var vX = _n0.a;
 		var vY = _n0.b;
-		var pos = _Utils_Tuple2(player.W.a + (vX * deltaTime), player.W.b + (vY * deltaTime));
+		var pos = _Utils_Tuple2(player.X.a + (vX * deltaTime), player.X.b + (vY * deltaTime));
 		return _Utils_update(
 			player,
-			{W: pos, _: time});
+			{X: pos, aa: time});
 	});
 var author$project$Data$Game$moveAllUntil = F2(
 	function (newFrameTime, _n0) {
@@ -6171,8 +6180,8 @@ var author$project$Data$Game$moveAllUntil = F2(
 			0,
 			author$project$Physical$Field$height,
 			A2(author$project$Physical$Player$moveUntil, newFrameTime, game.i));
-		var newBalls = A2(author$project$Data$Game$moveBallsUntil, newFrameTime, game.c);
-		var duration = elm$time$Time$posixToMillis(newFrameTime) - elm$time$Time$posixToMillis(game.T);
+		var newBalls = A2(author$project$Data$Game$moveBallsUntil, newFrameTime, game.d);
+		var duration = elm$time$Time$posixToMillis(newFrameTime) - elm$time$Time$posixToMillis(game.x);
 		var newBullets = A2(
 			elm$core$Dict$map,
 			F2(
@@ -6187,7 +6196,7 @@ var author$project$Data$Game$moveAllUntil = F2(
 		return _Utils_Tuple2(
 			_Utils_update(
 				game,
-				{c: newBalls, a: newBullets, T: newFrameTime, i: newPlayer1, j: newPlayer2, k: newPlayer3, l: newPlayer4}),
+				{d: newBalls, a: newBullets, x: newFrameTime, i: newPlayer1, j: newPlayer2, k: newPlayer3, l: newPlayer4}),
 			sounds);
 	});
 var author$project$Physical$Player$maxSpeed = 1.0;
@@ -6202,14 +6211,14 @@ var author$project$Physical$Player$prepareMovement = F4(
 			if (!_n1.$) {
 				var stunnedTime = _n1.a;
 				return _Utils_cmp(
-					elm$time$Time$posixToMillis(player._) - elm$time$Time$posixToMillis(stunnedTime),
+					elm$time$Time$posixToMillis(player.aa) - elm$time$Time$posixToMillis(stunnedTime),
 					author$project$Physical$Player$maxStunDuration) < 0;
 			} else {
 				return false;
 			}
 		}();
 		var stunned = stillStunned ? player.bn : elm$core$Maybe$Nothing;
-		var _n0 = player.d;
+		var _n0 = player.c;
 		var oldVX = _n0.a;
 		var oldVY = _n0.b;
 		var speed = (stillStunned || (!thrusting)) ? _Utils_Tuple2(viscosityCoef * oldVX, viscosityCoef * oldVY) : _Utils_Tuple2(
@@ -6217,7 +6226,7 @@ var author$project$Physical$Player$prepareMovement = F4(
 			(viscosityCoef * oldVY) + (thrust * elm$core$Basics$sin(direction)));
 		return _Utils_update(
 			player,
-			{p: direction, d: speed, bn: stunned, br: thrusting});
+			{m: direction, c: speed, bn: stunned, br: thrusting});
 	});
 var author$project$Data$Game$preparePlayers = F4(
 	function (duration, directions, thrustings, _n0) {
@@ -6284,9 +6293,9 @@ var author$project$Processing$Collision$collideBallWithBall = F3(
 		var ball2 = _n1.b;
 		var d = 2 * author$project$Physical$Ball$size;
 		var dd = d * d;
-		var b = A2(author$project$Data$Vector$fromTo, ball1.W, ball2.W);
+		var b = A2(author$project$Data$Vector$fromTo, ball1.X, ball2.X);
 		var bb = author$project$Data$Vector$norm2(b);
-		var a = A2(author$project$Data$Vector$fromTo, ball1.d, ball2.d);
+		var a = A2(author$project$Data$Vector$fromTo, ball1.c, ball2.c);
 		var aa = author$project$Data$Vector$norm2(a);
 		var ab = A2(author$project$Data$Vector$dot, a, b);
 		var discriminant = (ab * ab) - (aa * (bb - dd));
@@ -6390,10 +6399,10 @@ var author$project$Processing$Collision$collideBallWithWalls = F2(
 	function (duration, _n0) {
 		var id = _n0.a;
 		var ball = _n0.b;
-		var _n1 = ball.W;
+		var _n1 = ball.X;
 		var x = _n1.a;
 		var y = _n1.b;
-		var _n2 = ball.d;
+		var _n2 = ball.c;
 		var vX = _n2.a;
 		var vY = _n2.b;
 		var leftTime = A3(
@@ -6437,23 +6446,23 @@ var author$project$Physical$Bullet$bigSize = 60;
 var author$project$Physical$Bullet$mediumSize = 40;
 var author$project$Physical$Bullet$smallSize = 20;
 var author$project$Physical$Bullet$radiusAndSpeed = function (bullet) {
-	var _n0 = bullet.aW;
+	var _n0 = bullet.aX;
 	switch (_n0) {
 		case 0:
 			return _Utils_Tuple3(
 				author$project$Physical$Bullet$smallSize,
-				author$project$Physical$Bullet$smallSpeed * elm$core$Basics$cos(bullet.p),
-				author$project$Physical$Bullet$smallSpeed * elm$core$Basics$sin(bullet.p));
+				author$project$Physical$Bullet$smallSpeed * elm$core$Basics$cos(bullet.m),
+				author$project$Physical$Bullet$smallSpeed * elm$core$Basics$sin(bullet.m));
 		case 1:
 			return _Utils_Tuple3(
 				author$project$Physical$Bullet$mediumSize,
-				author$project$Physical$Bullet$mediumSpeed * elm$core$Basics$cos(bullet.p),
-				author$project$Physical$Bullet$mediumSpeed * elm$core$Basics$sin(bullet.p));
+				author$project$Physical$Bullet$mediumSpeed * elm$core$Basics$cos(bullet.m),
+				author$project$Physical$Bullet$mediumSpeed * elm$core$Basics$sin(bullet.m));
 		default:
 			return _Utils_Tuple3(
 				author$project$Physical$Bullet$bigSize,
-				author$project$Physical$Bullet$bigSpeed * elm$core$Basics$cos(bullet.p),
-				author$project$Physical$Bullet$bigSpeed * elm$core$Basics$sin(bullet.p));
+				author$project$Physical$Bullet$bigSpeed * elm$core$Basics$cos(bullet.m),
+				author$project$Physical$Bullet$bigSpeed * elm$core$Basics$sin(bullet.m));
 	}
 };
 var author$project$Processing$Collision$BulletBall = F2(
@@ -6466,7 +6475,7 @@ var author$project$Processing$Collision$collideBallWithBullet = F3(
 		var ball = _n0.b;
 		var id = _n1.a;
 		var bullet = _n1.b;
-		var b = A2(author$project$Data$Vector$fromTo, ball.W, bullet.W);
+		var b = A2(author$project$Data$Vector$fromTo, ball.X, bullet.X);
 		var bb = author$project$Data$Vector$norm2(b);
 		var _n2 = author$project$Physical$Bullet$radiusAndSpeed(bullet);
 		var bulletRadius = _n2.a;
@@ -6476,7 +6485,7 @@ var author$project$Processing$Collision$collideBallWithBullet = F3(
 		var dd = d * d;
 		var a = A2(
 			author$project$Data$Vector$fromTo,
-			ball.d,
+			ball.c,
 			_Utils_Tuple2(bulletSpeedX, bulletSpeedY));
 		var aa = author$project$Data$Vector$norm2(a);
 		var ab = A2(author$project$Data$Vector$dot, a, b);
@@ -6556,7 +6565,7 @@ var author$project$Processing$Collision$collideBulletWithBullet = F3(
 		var bullet1 = _n0.b;
 		var id2 = _n1.a;
 		var bullet2 = _n1.b;
-		var b = A2(author$project$Data$Vector$fromTo, bullet1.W, bullet2.W);
+		var b = A2(author$project$Data$Vector$fromTo, bullet1.X, bullet2.X);
 		var bb = author$project$Data$Vector$norm2(b);
 		var _n2 = author$project$Physical$Bullet$radiusAndSpeed(bullet2);
 		var radius2 = _n2.a;
@@ -6607,7 +6616,7 @@ var author$project$Processing$Collision$collideWithWalls = F2(
 	function (duration, _n0) {
 		var id = _n0.a;
 		var bullet = _n0.b;
-		var _n1 = bullet.W;
+		var _n1 = bullet.X;
 		var x = _n1.a;
 		var y = _n1.b;
 		var _n2 = author$project$Physical$Bullet$radiusAndSpeed(bullet);
@@ -6667,9 +6676,9 @@ var author$project$Processing$Collision$collidePlayerWithBall = F3(
 		var ball = _n1.b;
 		var d = author$project$Physical$Player$size + author$project$Physical$Ball$size;
 		var dd = d * d;
-		var b = A2(author$project$Data$Vector$fromTo, player.W, ball.W);
+		var b = A2(author$project$Data$Vector$fromTo, player.X, ball.X);
 		var bb = author$project$Data$Vector$norm2(b);
-		var a = A2(author$project$Data$Vector$fromTo, player.d, ball.d);
+		var a = A2(author$project$Data$Vector$fromTo, player.c, ball.c);
 		var aa = author$project$Data$Vector$norm2(a);
 		var ab = A2(author$project$Data$Vector$dot, a, b);
 		var discriminant = (ab * ab) - (aa * (bb - dd));
@@ -6732,7 +6741,7 @@ var author$project$Processing$Collision$collidePlayerWithBullet = F3(
 		var player = _n0.b;
 		var bulletId = _n1.a;
 		var bullet = _n1.b;
-		var b = A2(author$project$Data$Vector$fromTo, player.W, bullet.W);
+		var b = A2(author$project$Data$Vector$fromTo, player.X, bullet.X);
 		var bb = author$project$Data$Vector$norm2(b);
 		var _n2 = author$project$Physical$Bullet$radiusAndSpeed(bullet);
 		var bulletRadius = _n2.a;
@@ -6742,7 +6751,7 @@ var author$project$Processing$Collision$collidePlayerWithBullet = F3(
 		var dd = d * d;
 		var a = A2(
 			author$project$Data$Vector$fromTo,
-			player.d,
+			player.c,
 			_Utils_Tuple2(bulletSpeedX, bulletSpeedY));
 		var aa = author$project$Data$Vector$norm2(a);
 		var ab = A2(author$project$Data$Vector$dot, a, b);
@@ -6814,7 +6823,7 @@ var author$project$Data$Game$allCollisions = F2(
 		var player2 = game.j;
 		var player3 = game.k;
 		var player4 = game.l;
-		var duration = elm$time$Time$posixToMillis(endTime) - elm$time$Time$posixToMillis(game.T);
+		var duration = elm$time$Time$posixToMillis(endTime) - elm$time$Time$posixToMillis(game.x);
 		var allBulletsList = A2(
 			elm$core$List$map,
 			elm$core$Tuple$mapSecond(
@@ -6822,7 +6831,7 @@ var author$project$Data$Game$allCollisions = F2(
 					return $.q;
 				}),
 			elm$core$Dict$toList(game.a));
-		var allBallsWithId = elm$core$Dict$toList(game.c.b);
+		var allBallsWithId = elm$core$Dict$toList(game.d.b);
 		return A2(
 			author$project$Data$ListExtra$reversePrepend,
 			A2(author$project$Processing$Collision$bulletWallAll, duration, allBulletsList),
@@ -6868,15 +6877,27 @@ var author$project$Data$Vector$times = F2(
 		var y = _n0.b;
 		return _Utils_Tuple2(scalar * x, scalar * y);
 	});
+var author$project$Data$Vector$setNorm = F2(
+	function (value, vector) {
+		return A2(
+			author$project$Data$Vector$times,
+			value / elm$core$Basics$sqrt(
+				author$project$Data$Vector$norm2(vector)),
+			vector);
+	});
 var author$project$Physical$Ball$moveDuring = F2(
 	function (duration, ball) {
 		var time = elm$time$Time$millisToPosix(
-			elm$time$Time$posixToMillis(ball._) + elm$core$Basics$floor(duration));
+			elm$time$Time$posixToMillis(ball.aa) + elm$core$Basics$floor(duration));
 		return A2(author$project$Physical$Ball$moveUntil, time, ball);
+	});
+var elm$core$Basics$always = F2(
+	function (a, _n0) {
+		return a;
 	});
 var author$project$Data$Game$impactBallBall = F4(
 	function (time, id1, id2, game) {
-		var balls = game.c;
+		var balls = game.d;
 		var _n0 = _Utils_Tuple2(
 			A2(elm$core$Dict$get, id1, balls.b),
 			A2(elm$core$Dict$get, id2, balls.b));
@@ -6884,30 +6905,102 @@ var author$project$Data$Game$impactBallBall = F4(
 			var ball1 = _n0.a.a;
 			var ball2 = _n0.b.a;
 			var b2 = A2(author$project$Physical$Ball$moveDuring, time, ball2);
+			var smash1 = A2(
+				elm$core$Maybe$map,
+				elm$core$Basics$always(game.x),
+				b2.u);
 			var b1 = A2(author$project$Physical$Ball$moveDuring, time, ball1);
-			var centerDiff = A2(author$project$Data$Vector$diff, b1.W, b2.W);
+			var centerDiff = A2(author$project$Data$Vector$diff, b1.X, b2.X);
 			var squareDistance = 1.0e-6 + author$project$Data$Vector$norm2(centerDiff);
-			var speedDiff = A2(author$project$Data$Vector$diff, b1.d, b2.d);
-			var newSpeed1 = A2(
-				author$project$Data$Vector$diff,
-				b1.d,
-				A2(
-					author$project$Data$Vector$times,
-					A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
-					centerDiff));
+			var smash2 = A2(
+				elm$core$Maybe$map,
+				elm$core$Basics$always(game.x),
+				b1.u);
+			var speedDiff = A2(author$project$Data$Vector$diff, b1.c, b2.c);
+			var newSpeed1 = function () {
+				var _n5 = _Utils_Tuple2(b1.u, smash1);
+				if (!_n5.b.$) {
+					return A2(
+						author$project$Data$Vector$setNorm,
+						3.0,
+						A2(
+							author$project$Data$Vector$diff,
+							b1.c,
+							A2(
+								author$project$Data$Vector$times,
+								A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
+								centerDiff)));
+				} else {
+					if (_n5.a.$ === 1) {
+						var _n6 = _n5.a;
+						var _n7 = _n5.b;
+						return A2(
+							author$project$Data$Vector$diff,
+							b1.c,
+							A2(
+								author$project$Data$Vector$times,
+								A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
+								centerDiff));
+					} else {
+						var _n8 = _n5.b;
+						return A2(
+							author$project$Data$Vector$times,
+							0.5,
+							A2(
+								author$project$Data$Vector$diff,
+								b1.c,
+								A2(
+									author$project$Data$Vector$times,
+									A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
+									centerDiff)));
+					}
+				}
+			}();
 			var newBall1 = _Utils_update(
 				b1,
-				{d: newSpeed1});
-			var newSpeed2 = A2(
-				author$project$Data$Vector$add,
-				b2.d,
-				A2(
-					author$project$Data$Vector$times,
-					A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
-					centerDiff));
+				{u: smash1, c: newSpeed1});
+			var newSpeed2 = function () {
+				var _n1 = _Utils_Tuple2(b2.u, smash2);
+				if (!_n1.b.$) {
+					return A2(
+						author$project$Data$Vector$setNorm,
+						3.0,
+						A2(
+							author$project$Data$Vector$add,
+							b2.c,
+							A2(
+								author$project$Data$Vector$times,
+								A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
+								centerDiff)));
+				} else {
+					if (_n1.a.$ === 1) {
+						var _n2 = _n1.a;
+						var _n3 = _n1.b;
+						return A2(
+							author$project$Data$Vector$add,
+							b2.c,
+							A2(
+								author$project$Data$Vector$times,
+								A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
+								centerDiff));
+					} else {
+						var _n4 = _n1.b;
+						return A2(
+							author$project$Data$Vector$times,
+							0.5,
+							A2(
+								author$project$Data$Vector$add,
+								b2.c,
+								A2(
+									author$project$Data$Vector$times,
+									A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
+									centerDiff)));
+					}
+				}
+			}();
 			var newBall2 = _Utils_update(
 				b2,
-				{d: newSpeed2});
+				{u: smash2, c: newSpeed2});
 			var ballsInGame = A3(
 				elm$core$Dict$insert,
 				id2,
@@ -6916,7 +7009,7 @@ var author$project$Data$Game$impactBallBall = F4(
 			return _Utils_update(
 				game,
 				{
-					c: _Utils_update(
+					d: _Utils_update(
 						balls,
 						{b: ballsInGame})
 				});
@@ -6941,41 +7034,41 @@ var author$project$Physical$Player$stun = function (player) {
 	return _Utils_update(
 		player,
 		{
-			O: elm$core$Maybe$Nothing,
-			bn: elm$core$Maybe$Just(player._)
+			Q: elm$core$Maybe$Nothing,
+			bn: elm$core$Maybe$Just(player.aa)
 		});
 };
 var author$project$Data$Game$impactBallPlayer = F4(
 	function (time, ballId, oneOfFour, game) {
-		var balls = game.c;
+		var balls = game.d;
 		var _n0 = A2(elm$core$Dict$get, ballId, balls.b);
 		if (!_n0.$) {
 			var ball = _n0.a;
 			var player = A2(author$project$Data$Game$playerNumber, oneOfFour, game);
 			var b = A2(author$project$Physical$Ball$moveDuring, time, ball);
-			var centerDiff = A2(author$project$Data$Vector$diff, b.W, player.W);
+			var centerDiff = A2(author$project$Data$Vector$diff, b.X, player.X);
 			var squareDistance = 1.0e-6 + author$project$Data$Vector$norm2(centerDiff);
-			var speedDiff = A2(author$project$Data$Vector$diff, b.d, player.d);
-			var newBallSpeed = A2(
+			var speedDiff = A2(author$project$Data$Vector$diff, b.c, player.c);
+			var newBallSpeed = (!time) ? b.c : A2(
 				author$project$Data$Vector$times,
 				0.2,
 				A2(
 					author$project$Data$Vector$diff,
-					b.d,
+					b.c,
 					A2(
 						author$project$Data$Vector$times,
 						A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
 						centerDiff)));
 			var newBall = _Utils_update(
 				b,
-				{d: newBallSpeed});
+				{u: elm$core$Maybe$Nothing, c: newBallSpeed});
 			var ballsInGame = A3(elm$core$Dict$insert, ballId, newBall, balls.b);
 			var newBalls = _Utils_update(
 				balls,
 				{b: ballsInGame});
-			var newPlayerSpeed = A2(
+			var newPlayerSpeed = (!time) ? A2(author$project$Data$Vector$times, (-20.0) / squareDistance, centerDiff) : A2(
 				author$project$Data$Vector$add,
-				player.d,
+				player.c,
 				A2(
 					author$project$Data$Vector$times,
 					A2(author$project$Data$Vector$dot, speedDiff, centerDiff) / squareDistance,
@@ -6983,24 +7076,24 @@ var author$project$Data$Game$impactBallPlayer = F4(
 			var newPlayer = author$project$Physical$Player$stun(
 				_Utils_update(
 					player,
-					{d: newPlayerSpeed}));
+					{c: newPlayerSpeed}));
 			switch (oneOfFour) {
 				case 0:
 					return _Utils_update(
 						game,
-						{c: newBalls, i: newPlayer});
+						{d: newBalls, i: newPlayer});
 				case 1:
 					return _Utils_update(
 						game,
-						{c: newBalls, j: newPlayer});
+						{d: newBalls, j: newPlayer});
 				case 2:
 					return _Utils_update(
 						game,
-						{c: newBalls, k: newPlayer});
+						{d: newBalls, k: newPlayer});
 				default:
 					return _Utils_update(
 						game,
-						{c: newBalls, l: newPlayer});
+						{d: newBalls, l: newPlayer});
 			}
 		} else {
 			return game;
@@ -7382,7 +7475,7 @@ var elm$core$Tuple$mapFirst = F2(
 var author$project$Data$Game$impactBallWall = F4(
 	function (time, ballId, wall, _n0) {
 		var game = _n0.a;
-		var balls = game.c;
+		var balls = game.d;
 		var sounds = _n0.b;
 		var _n1 = _Utils_Tuple2(
 			A2(elm$core$Dict$get, ballId, balls.b),
@@ -7393,13 +7486,13 @@ var author$project$Data$Game$impactBallWall = F4(
 					var ball = _n1.a.a;
 					var _n2 = _n1.b;
 					var movedBall = A2(author$project$Physical$Ball$moveDuring, time, ball);
-					var _n3 = movedBall.d;
+					var _n3 = movedBall.c;
 					var vX = _n3.a;
 					var vY = _n3.b;
 					var newBall = _Utils_update(
 						movedBall,
 						{
-							d: _Utils_Tuple2(
+							c: _Utils_Tuple2(
 								vX,
 								A2(elm$core$Basics$max, -vY, vY))
 						});
@@ -7408,7 +7501,7 @@ var author$project$Data$Game$impactBallWall = F4(
 						_Utils_update(
 							game,
 							{
-								c: _Utils_update(
+								d: _Utils_update(
 									balls,
 									{b: ballsInGame})
 							}),
@@ -7417,13 +7510,13 @@ var author$project$Data$Game$impactBallWall = F4(
 					var ball = _n1.a.a;
 					var _n4 = _n1.b;
 					var movedBall = A2(author$project$Physical$Ball$moveDuring, time, ball);
-					var _n5 = movedBall.d;
+					var _n5 = movedBall.c;
 					var vX = _n5.a;
 					var vY = _n5.b;
 					var newBall = _Utils_update(
 						movedBall,
 						{
-							d: _Utils_Tuple2(
+							c: _Utils_Tuple2(
 								vX,
 								A2(elm$core$Basics$min, -vY, vY))
 						});
@@ -7432,7 +7525,7 @@ var author$project$Data$Game$impactBallWall = F4(
 						_Utils_update(
 							game,
 							{
-								c: _Utils_update(
+								d: _Utils_update(
 									balls,
 									{b: ballsInGame})
 							}),
@@ -7444,17 +7537,17 @@ var author$project$Data$Game$impactBallWall = F4(
 						balls,
 						{
 							b: A2(elm$core$Dict$remove, ballId, balls.b),
-							C: A2(elm$core$List$cons, ballId, balls.C)
+							E: A2(elm$core$List$cons, ballId, balls.E)
 						});
 					return _Utils_Tuple2(
 						_Utils_update(
 							game,
 							{
-								c: newBalls,
-								N: A2(
+								d: newBalls,
+								P: A2(
 									elm$core$Tuple$mapSecond,
 									elm$core$Basics$add(1),
-									game.N)
+									game.P)
 							}),
 						A2(
 							elm$core$List$cons,
@@ -7467,17 +7560,17 @@ var author$project$Data$Game$impactBallWall = F4(
 						balls,
 						{
 							b: A2(elm$core$Dict$remove, ballId, balls.b),
-							C: A2(elm$core$List$cons, ballId, balls.C)
+							E: A2(elm$core$List$cons, ballId, balls.E)
 						});
 					return _Utils_Tuple2(
 						_Utils_update(
 							game,
 							{
-								c: newBalls,
-								N: A2(
+								d: newBalls,
+								P: A2(
 									elm$core$Tuple$mapFirst,
 									elm$core$Basics$add(1),
-									game.N)
+									game.P)
 							}),
 						A2(
 							elm$core$List$cons,
@@ -7502,27 +7595,51 @@ var author$project$Data$Game$impactBulletBullet = F3(
 	});
 var author$project$Data$Game$impactBulletOnBall = F3(
 	function (time, bullet, ball) {
-		var movedBall = A2(author$project$Physical$Ball$moveDuring, time, ball);
-		var impactForce = function () {
-			var _n1 = bullet.aW;
-			switch (_n1) {
-				case 0:
-					return 0.2;
-				case 1:
-					return 1.0;
-				default:
-					return 3.0;
-			}
-		}();
-		var _n0 = movedBall.d;
+		var movedBall = A2(author$project$Physical$Ball$moveUntil, time, ball);
+		var _n0 = movedBall.c;
 		var speedX = _n0.a;
 		var speedY = _n0.b;
-		var newSpeed = _Utils_Tuple2(
-			speedX + (impactForce * elm$core$Basics$cos(bullet.p)),
-			speedY + (impactForce * elm$core$Basics$sin(bullet.p)));
+		var _n1 = function () {
+			var _n2 = _Utils_Tuple2(bullet.aX, ball.u);
+			_n2$2:
+			while (true) {
+				if (_n2.b.$ === 1) {
+					switch (_n2.a) {
+						case 0:
+							var _n3 = _n2.a;
+							var _n4 = _n2.b;
+							return _Utils_Tuple3(
+								speedX + (0.2 * elm$core$Basics$cos(bullet.m)),
+								speedY + (0.2 * elm$core$Basics$sin(bullet.m)),
+								elm$core$Maybe$Nothing);
+						case 1:
+							var _n5 = _n2.a;
+							var _n6 = _n2.b;
+							return _Utils_Tuple3(
+								speedX + (1.0 * elm$core$Basics$cos(bullet.m)),
+								speedY + (1.0 * elm$core$Basics$sin(bullet.m)),
+								elm$core$Maybe$Nothing);
+						default:
+							break _n2$2;
+					}
+				} else {
+					break _n2$2;
+				}
+			}
+			return _Utils_Tuple3(
+				3.0 * elm$core$Basics$cos(bullet.m),
+				3.0 * elm$core$Basics$sin(bullet.m),
+				elm$core$Maybe$Just(time));
+		}();
+		var newSpeedX = _n1.a;
+		var newSpeedY = _n1.b;
+		var smash = _n1.c;
 		return _Utils_update(
 			movedBall,
-			{d: newSpeed});
+			{
+				u: smash,
+				c: _Utils_Tuple2(newSpeedX, newSpeedY)
+			});
 	});
 var elm$core$Dict$update = F3(
 	function (targetKey, alter, dictionary) {
@@ -7549,6 +7666,8 @@ var author$project$Data$Game$updateBallWithId = F3(
 	});
 var author$project$Data$Game$impactIdentifiedBulletOnBall = F4(
 	function (time, id, ballId, game) {
+		var posixTime = elm$time$Time$millisToPosix(
+			elm$time$Time$posixToMillis(game.x) + elm$core$Basics$floor(time));
 		var _n0 = A2(elm$core$Dict$get, id, game.a);
 		if (_n0.$ === 1) {
 			return game;
@@ -7557,11 +7676,11 @@ var author$project$Data$Game$impactIdentifiedBulletOnBall = F4(
 			return _Utils_update(
 				game,
 				{
-					c: A3(
+					d: A3(
 						author$project$Data$Game$updateBallWithId,
-						A2(author$project$Data$Game$impactBulletOnBall, time, bullet),
+						A2(author$project$Data$Game$impactBulletOnBall, posixTime, bullet),
 						ballId,
-						game.c),
+						game.d),
 					a: A2(elm$core$Dict$remove, id, game.a)
 				});
 		}
@@ -7569,14 +7688,14 @@ var author$project$Data$Game$impactIdentifiedBulletOnBall = F4(
 var author$project$Physical$Player$moveDuring = F2(
 	function (duration, player) {
 		var time = elm$time$Time$millisToPosix(
-			elm$time$Time$posixToMillis(player._) + elm$core$Basics$floor(duration));
+			elm$time$Time$posixToMillis(player.aa) + elm$core$Basics$floor(duration));
 		return A2(author$project$Physical$Player$moveUntil, time, player);
 	});
 var author$project$Data$Game$impactBulletOnPlayer = F3(
 	function (time, bullet, player) {
 		var movedPlayer = A2(author$project$Physical$Player$moveDuring, time, player);
 		var impactForce = function () {
-			var _n2 = bullet.aW;
+			var _n2 = bullet.aX;
 			switch (_n2) {
 				case 0:
 					return 0.5;
@@ -7586,22 +7705,22 @@ var author$project$Data$Game$impactBulletOnPlayer = F3(
 					return 2.0;
 			}
 		}();
-		var _n0 = player.d;
+		var _n0 = player.c;
 		var speedX = _n0.a;
 		var speedY = _n0.b;
 		var newSpeed = _Utils_Tuple2(
-			speedX + (impactForce * elm$core$Basics$cos(bullet.p)),
-			speedY + (impactForce * elm$core$Basics$sin(bullet.p)));
+			speedX + (impactForce * elm$core$Basics$cos(bullet.m)),
+			speedY + (impactForce * elm$core$Basics$sin(bullet.m)));
 		var _n1 = player.bn;
 		if (_n1.$ === 1) {
 			return author$project$Physical$Player$stun(
 				_Utils_update(
 					movedPlayer,
-					{d: newSpeed}));
+					{c: newSpeed}));
 		} else {
 			return _Utils_update(
 				movedPlayer,
-				{d: newSpeed});
+				{c: newSpeed});
 		}
 	});
 var author$project$Data$Game$impactIdentifiedBulletOnPlayer = F4(
@@ -7736,14 +7855,14 @@ var author$project$Physical$Bullet$Medium = 1;
 var author$project$Physical$Bullet$Small = 0;
 var author$project$Physical$Bullet$Bullet = F3(
 	function (size, direction, pos) {
-		return {p: direction, W: pos, aW: size};
+		return {m: direction, X: pos, aX: size};
 	});
 var author$project$Physical$Bullet$new = author$project$Physical$Bullet$Bullet;
 var author$project$Physical$Player$bigChargeTime = 2000;
 var author$project$Physical$Player$mediumChargeTime = 1000;
 var author$project$Data$Game$spawnPlayerBullet = F2(
 	function (duration, player) {
-		var _n0 = player.W;
+		var _n0 = player.X;
 		var x = _n0.a;
 		var y = _n0.b;
 		var _n1 = (_Utils_cmp(duration, author$project$Physical$Player$bigChargeTime) > 0) ? _Utils_Tuple2(2, author$project$Physical$Bullet$bigSize) : ((_Utils_cmp(duration, author$project$Physical$Player$mediumChargeTime) > 0) ? _Utils_Tuple2(1, author$project$Physical$Bullet$mediumSize) : _Utils_Tuple2(0, author$project$Physical$Bullet$smallSize));
@@ -7751,22 +7870,22 @@ var author$project$Data$Game$spawnPlayerBullet = F2(
 		var bulletSizeFloat = _n1.b;
 		var creationDistance = (1.0 + author$project$Physical$Player$size) + bulletSizeFloat;
 		var bulletPos = _Utils_Tuple2(
-			x + (creationDistance * elm$core$Basics$cos(player.p)),
-			y + (creationDistance * elm$core$Basics$sin(player.p)));
-		return A3(author$project$Physical$Bullet$new, bulletSize, player.p, bulletPos);
+			x + (creationDistance * elm$core$Basics$cos(player.m)),
+			y + (creationDistance * elm$core$Basics$sin(player.m)));
+		return A3(author$project$Physical$Bullet$new, bulletSize, player.m, bulletPos);
 	});
 var author$project$Physical$Player$shotRecoil = F2(
 	function (chargeDuration, player) {
 		var recoilForce = (_Utils_cmp(chargeDuration, author$project$Physical$Player$bigChargeTime) > 0) ? 1.2 : ((_Utils_cmp(chargeDuration, author$project$Physical$Player$mediumChargeTime) > 0) ? 0.8 : 0.4);
-		var _n0 = player.d;
+		var _n0 = player.c;
 		var vX = _n0.a;
 		var vY = _n0.b;
 		var newSpeed = _Utils_Tuple2(
-			vX - (recoilForce * elm$core$Basics$cos(player.p)),
-			vY - (recoilForce * elm$core$Basics$sin(player.p)));
+			vX - (recoilForce * elm$core$Basics$cos(player.m)),
+			vY - (recoilForce * elm$core$Basics$sin(player.m)));
 		return _Utils_update(
 			player,
-			{d: newSpeed});
+			{c: newSpeed});
 	});
 var author$project$Data$Game$updateBullets = F4(
 	function (oneOfFour, hasShot, player, game) {
@@ -7776,28 +7895,28 @@ var author$project$Data$Game$updateBullets = F4(
 			var chargeTime = hasShot.a;
 			var playerBullet = {
 				q: A2(author$project$Data$Game$spawnPlayerBullet, chargeTime, player),
-				aN: oneOfFour
+				aO: oneOfFour
 			};
 			var newPlayer = A2(author$project$Physical$Player$shotRecoil, chargeTime, player);
-			var newId = game.y + 1;
-			var newBullets = A3(elm$core$Dict$insert, game.y, playerBullet, game.a);
+			var newId = game.A + 1;
+			var newBullets = A3(elm$core$Dict$insert, game.A, playerBullet, game.a);
 			switch (oneOfFour) {
 				case 0:
 					return _Utils_update(
 						game,
-						{a: newBullets, i: newPlayer, y: newId});
+						{a: newBullets, i: newPlayer, A: newId});
 				case 1:
 					return _Utils_update(
 						game,
-						{a: newBullets, j: newPlayer, y: newId});
+						{a: newBullets, j: newPlayer, A: newId});
 				case 2:
 					return _Utils_update(
 						game,
-						{a: newBullets, k: newPlayer, y: newId});
+						{a: newBullets, k: newPlayer, A: newId});
 				default:
 					return _Utils_update(
 						game,
-						{a: newBullets, l: newPlayer, y: newId});
+						{a: newBullets, l: newPlayer, A: newId});
 			}
 		}
 	});
@@ -7808,7 +7927,7 @@ var author$project$Physical$Player$ShotAfter = function (a) {
 };
 var author$project$Physical$Player$updateShot = F2(
 	function (spaceBarDown, player) {
-		var _n0 = _Utils_Tuple3(player.bn, spaceBarDown, player.O);
+		var _n0 = _Utils_Tuple3(player.bn, spaceBarDown, player.Q);
 		_n0$2:
 		while (true) {
 			if (_n0.a.$ === 1) {
@@ -7820,7 +7939,7 @@ var author$project$Physical$Player$updateShot = F2(
 							_Utils_update(
 								player,
 								{
-									O: elm$core$Maybe$Just(player._)
+									Q: elm$core$Maybe$Just(player.aa)
 								}),
 							author$project$Physical$Player$NoShot,
 							_List_Nil);
@@ -7831,11 +7950,11 @@ var author$project$Physical$Player$updateShot = F2(
 					if (!_n0.c.$) {
 						var _n3 = _n0.a;
 						var prepTime = _n0.c.a;
-						var duration = elm$time$Time$posixToMillis(player._) - elm$time$Time$posixToMillis(prepTime);
+						var duration = elm$time$Time$posixToMillis(player.aa) - elm$time$Time$posixToMillis(prepTime);
 						return _Utils_Tuple3(
 							_Utils_update(
 								player,
-								{O: elm$core$Maybe$Nothing}),
+								{Q: elm$core$Maybe$Nothing}),
 							author$project$Physical$Player$ShotAfter(duration),
 							_List_fromArray(
 								[
@@ -7920,10 +8039,10 @@ var author$project$Data$Game$update = F4(
 		};
 		var newShotKeys = {a9: playerControls.a9.bb, bk: playerControls.bk.bb, bq: playerControls.bq.bb, bt: playerControls.bt.bb};
 		var newDirections = {
-			a9: A2(elm$core$Maybe$withDefault, game.l.p, playerControls.a9.br),
-			bk: A2(elm$core$Maybe$withDefault, game.i.p, playerControls.bk.br),
-			bq: A2(elm$core$Maybe$withDefault, game.k.p, playerControls.bq.br),
-			bt: A2(elm$core$Maybe$withDefault, game.j.p, playerControls.bt.br)
+			a9: A2(elm$core$Maybe$withDefault, game.l.m, playerControls.a9.br),
+			bk: A2(elm$core$Maybe$withDefault, game.i.m, playerControls.bk.br),
+			bq: A2(elm$core$Maybe$withDefault, game.k.m, playerControls.bq.br),
+			bt: A2(elm$core$Maybe$withDefault, game.j.m, playerControls.bt.br)
 		};
 		return A2(
 			author$project$Data$Game$spawnAllBullets,
@@ -7966,21 +8085,21 @@ var author$project$Main$update = F2(
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{aW: size}),
+					{aX: size}),
 				elm$core$Platform$Cmd$none);
 		} else {
 			var blob = msg.a;
 			var newFrameTime = author$project$Controller$Gamepad$animationFrameTimestamp(blob);
 			var gamepads = author$project$Controller$Gamepad$getGamepads(blob);
-			var newPlayerControls = A2(author$project$Controller$Gamepad$updatePlayerControls, gamepads, model.ag);
-			var duration = elm$time$Time$posixToMillis(newFrameTime) - elm$time$Time$posixToMillis(model.T);
-			var _n1 = A4(author$project$Data$Game$update, newFrameTime, duration, newPlayerControls, model.U);
+			var newPlayerControls = A2(author$project$Controller$Gamepad$updatePlayerControls, gamepads, model.ah);
+			var duration = elm$time$Time$posixToMillis(newFrameTime) - elm$time$Time$posixToMillis(model.x);
+			var _n1 = A4(author$project$Data$Game$update, newFrameTime, duration, newPlayerControls, model.V);
 			var game = _n1.a;
 			var soundEffects = _n1.b;
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{ae: model.aW, T: newFrameTime, U: game, ag: newPlayerControls}),
+					{af: model.aX, x: newFrameTime, V: game, ah: newPlayerControls}),
 				elm$core$Platform$Cmd$batch(
 					A2(
 						elm$core$List$map,
@@ -7994,6 +8113,8 @@ var author$project$Views$Colors$blue = 'rgba(28, 139, 237, 1)';
 var author$project$Views$Colors$playerB = author$project$Views$Colors$blue;
 var author$project$Views$Colors$gray = 'rgba(87, 123, 147, 1)';
 var author$project$Views$Colors$ball = author$project$Views$Colors$gray;
+var author$project$Views$Colors$black = 'rgba(28, 40, 45, 1)';
+var author$project$Views$Colors$ballSmash = author$project$Views$Colors$black;
 var elm$core$String$fromFloat = _String_fromNumber;
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
@@ -8015,10 +8136,19 @@ var elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var author$project$Views$Svg$Ball$view = function (_n0) {
-	var pos = _n0.W;
-	var speed = _n0.d;
-	var superspeed = _n0.aZ;
+	var pos = _n0.X;
+	var speed = _n0.c;
+	var smash = _n0.u;
+	var strokeWidth = function () {
+		if (!smash.$) {
+			return '10';
+		} else {
+			return '0';
+		}
+	}();
 	var _n1 = pos;
 	var x = _n1.a;
 	var y = _n1.b;
@@ -8032,7 +8162,9 @@ var author$project$Views$Svg$Ball$view = function (_n0) {
 				elm$core$String$fromFloat(y)),
 				elm$svg$Svg$Attributes$r(
 				elm$core$String$fromFloat(author$project$Physical$Ball$size)),
-				elm$svg$Svg$Attributes$fill(author$project$Views$Colors$ball)
+				elm$svg$Svg$Attributes$fill(author$project$Views$Colors$ball),
+				elm$svg$Svg$Attributes$stroke(author$project$Views$Colors$ballSmash),
+				elm$svg$Svg$Attributes$strokeWidth(strokeWidth)
 			]),
 		_List_Nil);
 };
@@ -8089,7 +8221,7 @@ var author$project$Views$Svg$Bullet$viewTriangle = F4(
 			_List_Nil);
 	});
 var author$project$Views$Svg$Bullet$view = function (_n0) {
-	var playerId = _n0.aN;
+	var playerId = _n0.aO;
 	var bullet = _n0.q;
 	var color = function () {
 		switch (playerId) {
@@ -8103,14 +8235,14 @@ var author$project$Views$Svg$Bullet$view = function (_n0) {
 				return author$project$Views$Colors$bulletB;
 		}
 	}();
-	var _n1 = bullet.aW;
+	var _n1 = bullet.aX;
 	switch (_n1) {
 		case 0:
-			return A4(author$project$Views$Svg$Bullet$viewTriangle, color, author$project$Physical$Bullet$smallSize, bullet.p, bullet.W);
+			return A4(author$project$Views$Svg$Bullet$viewTriangle, color, author$project$Physical$Bullet$smallSize, bullet.m, bullet.X);
 		case 1:
-			return A4(author$project$Views$Svg$Bullet$viewTriangle, color, author$project$Physical$Bullet$mediumSize, bullet.p, bullet.W);
+			return A4(author$project$Views$Svg$Bullet$viewTriangle, color, author$project$Physical$Bullet$mediumSize, bullet.m, bullet.X);
 		default:
-			return A4(author$project$Views$Svg$Bullet$viewTriangle, color, author$project$Physical$Bullet$bigSize, bullet.p, bullet.W);
+			return A4(author$project$Views$Svg$Bullet$viewTriangle, color, author$project$Physical$Bullet$bigSize, bullet.m, bullet.X);
 	}
 };
 var author$project$Views$Colors$lightYellow = 'rgba(255, 254, 244, 1)';
@@ -8220,15 +8352,13 @@ var author$project$Views$Colors$shootDisk = author$project$Views$Colors$white;
 var author$project$Views$Colors$shootDiskContour = author$project$Views$Colors$gray;
 var author$project$Views$Colors$stunDisk = author$project$Views$Colors$gray;
 var elm$svg$Svg$g = elm$svg$Svg$trustedNode('g');
-var elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var author$project$Views$Svg$Player$view = F2(
 	function (color, _n0) {
-		var pos = _n0.W;
-		var direction = _n0.p;
-		var shootPrep = _n0.O;
+		var pos = _n0.X;
+		var direction = _n0.m;
+		var shootPrep = _n0.Q;
 		var stunned = _n0.bn;
-		var timeState = _n0._;
+		var timeState = _n0.aa;
 		var stunOpacity = function () {
 			if (stunned.$ === 1) {
 				return '0';
@@ -8357,14 +8487,14 @@ var author$project$Views$Svg$Game$viewField = F2(
 			A2(
 				elm$core$List$map,
 				author$project$Views$Svg$Ball$view,
-				elm$core$Dict$values(game.c.b)));
+				elm$core$Dict$values(game.d.b)));
 		var ballSpawnTimer = function () {
-			var _n0 = game.c.ah;
+			var _n0 = game.d.ai;
 			if (!_n0.$) {
 				return A2(elm$svg$Svg$g, _List_Nil, _List_Nil);
 			} else {
 				var time = _n0.a;
-				var duration = A2(author$project$Data$Helper$timeDiff, time, game.T);
+				var duration = A2(author$project$Data$Helper$timeDiff, time, game.x);
 				var spawnRatio = duration / author$project$Data$Game$ballTimer;
 				return author$project$Views$Svg$Field$ballSpawnTimer(spawnRatio);
 			}
@@ -8436,9 +8566,9 @@ var author$project$Views$Svg$Game$viewScoreboard = F3(
 				]));
 	});
 var author$project$Main$view = function (_n0) {
-	var frameSize = _n0.ae;
-	var frameTime = _n0.T;
-	var game = _n0.U;
+	var frameSize = _n0.af;
+	var frameTime = _n0.x;
+	var game = _n0.V;
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
@@ -8449,7 +8579,7 @@ var author$project$Main$view = function (_n0) {
 			]),
 		_List_fromArray(
 			[
-				A3(author$project$Views$Svg$Game$viewScoreboard, game.N, game.aX, frameTime),
+				A3(author$project$Views$Svg$Game$viewScoreboard, game.P, game.aY, frameTime),
 				A2(author$project$Views$Svg$Game$viewField, frameSize, game)
 			]));
 };
@@ -8569,7 +8699,7 @@ var elm$core$String$contains = _String_contains;
 var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aD: fragment, aF: host, aL: path, aO: port_, aR: protocol, aS: query};
+		return {aE: fragment, aG: host, aM: path, aP: port_, aS: protocol, aT: query};
 	});
 var elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {
@@ -8684,7 +8814,7 @@ _Platform_export({'Main':{'init':author$project$Main$main(
 				elm$json$Json$Decode$andThen,
 				function (size) {
 					return elm$json$Json$Decode$succeed(
-						{aW: size, a$: time});
+						{aX: size, a$: time});
 				},
 				A2(
 					elm$json$Json$Decode$field,
@@ -8696,7 +8826,7 @@ _Platform_export({'Main':{'init':author$project$Main$main(
 								elm$json$Json$Decode$andThen,
 								function (height) {
 									return elm$json$Json$Decode$succeed(
-										{aE: height, a1: width});
+										{aF: height, a1: width});
 								},
 								A2(elm$json$Json$Decode$field, 'height', elm$json$Json$Decode$float));
 						},
