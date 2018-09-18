@@ -237,15 +237,26 @@ impactBallPlayer time ballId oneOfFour ({ balls } as game) =
                     0.000001 + Vector.norm2 centerDiff
 
                 newBallSpeed =
-                    centerDiff
-                        |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
-                        |> Vector.diff b.speed
-                        |> Vector.times 0.2
+                    if time == 0 then
+                        b.speed
+
+                    else
+                        centerDiff
+                            |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                            |> Vector.diff b.speed
+                            |> Vector.times 0.2
 
                 newPlayerSpeed =
-                    centerDiff
-                        |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
-                        |> Vector.add player.speed
+                    if time == 0 then
+                        centerDiff
+                            |> Vector.times (1 / squareDistance)
+                            |> Vector.diff player.speed
+                            |> Vector.times 3.0
+
+                    else
+                        centerDiff
+                            |> Vector.times (Vector.dot speedDiff centerDiff / squareDistance)
+                            |> Vector.add player.speed
 
                 newBall =
                     { b | speed = newBallSpeed }
