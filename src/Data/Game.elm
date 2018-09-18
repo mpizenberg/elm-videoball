@@ -248,10 +248,7 @@ impactBallPlayer time ballId oneOfFour ({ balls } as game) =
 
                 newPlayerSpeed =
                     if time == 0 then
-                        centerDiff
-                            |> Vector.times (1 / squareDistance)
-                            |> Vector.diff player.speed
-                            |> Vector.times 3.0
+                        Vector.times (-20.0 / squareDistance) centerDiff
 
                     else
                         centerDiff
@@ -259,7 +256,7 @@ impactBallPlayer time ballId oneOfFour ({ balls } as game) =
                             |> Vector.add player.speed
 
                 newBall =
-                    { b | speed = newBallSpeed }
+                    { b | speed = newBallSpeed, smash = Nothing }
 
                 ballsInGame =
                     Dict.insert ballId newBall balls.inGame
@@ -472,6 +469,11 @@ impactBulletOnPlayer time bullet player =
 
 impactIdentifiedBulletOnBall : Float -> Int -> Int -> Game -> Game
 impactIdentifiedBulletOnBall time id ballId game =
+    let
+        posixTime =
+            (Time.posixToMillis game.frameTime + floor time)
+                |> Time.millisToPosix
+    in
     case Dict.get id game.bullets of
         Nothing ->
             game
@@ -480,7 +482,7 @@ impactIdentifiedBulletOnBall time id ballId game =
             { game
               -- TODO later: if medium size bullet, do not destroy?
                 | bullets = Dict.remove id game.bullets
-                , balls = updateBallWithId (impactBulletOnBall time bullet) ballId game.balls
+                , balls = updateBallWithId (impactBulletOnBall posixTime bullet) ballId game.balls
             }
 
 
@@ -489,34 +491,37 @@ updateBallWithId f ballId balls =
     { balls | inGame = Dict.update ballId (Maybe.map f) balls.inGame }
 
 
-impactBulletOnBall : Float -> Bullet -> Ball -> Ball
+impactBulletOnBall : Time.Posix -> Bullet -> Ball -> Ball
 impactBulletOnBall time bullet ball =
     -- Let's only take bullet direction into account for simplicity for the time being
     let
         movedBall =
-            Ball.moveDuring time ball
+            Ball.moveUntil time ball
 
         ( speedX, speedY ) =
             movedBall.speed
 
-        impactForce =
-            case bullet.size of
-                Bullet.Small ->
-                    0.2
+        ( newSpeedX, newSpeedY, smash ) =
+            case ( bullet.size, ball.smash ) of
+                ( Bullet.Small, Nothing ) ->
+                    ( speedX + 0.2 * cos bullet.direction
+                    , speedY + 0.2 * sin bullet.direction
+                    , Nothing
+                    )
 
-                Bullet.Medium ->
-                    1.0
+                ( Bullet.Medium, Nothing ) ->
+                    ( speedX + 1.0 * cos bullet.direction
+                    , speedY + 1.0 * sin bullet.direction
+                    , Nothing
+                    )
 
-                Bullet.Big ->
-                    3.0
-
-        -- TODO later: if big, put ball in superspeed mode
-        newSpeed =
-            ( speedX + impactForce * cos bullet.direction
-            , speedY + impactForce * sin bullet.direction
-            )
+                _ ->
+                    ( 3.0 * cos bullet.direction
+                    , 3.0 * sin bullet.direction
+                    , Just time
+                    )
     in
-    { movedBall | speed = newSpeed }
+    { movedBall | speed = ( newSpeedX, newSpeedY ), smash = smash }
 
 
 allCollisions : Time.Posix -> Game -> List { time : Float, kind : Collision.Kind }
